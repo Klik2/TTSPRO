@@ -1,3 +1,4 @@
-Te_eR™ to Speech 
-Text to Bacot
+Te_eR™ to Speech |
+
+Text to Bacot PRO
 
