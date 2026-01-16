@@ -200,6 +200,12 @@ const AUDIO_SAMPLES = [
   { title: "Demo Suara Natural", file: "/Te_eR_Halo_ini_adalah_contoh_te_2026-01-13-21-54-44.wav", type: "Casual" },
   { title: "Doa & Murotal (Spiritual)", file: "/Te_eR_Doa_Meminta_Ampunan_Allah_2026-01-13-10-21-38.wav", type: "Murotal" },
   { title: "Tagline Text-to-Bacot", file: "/Te_eR_Text_to_BacotTeeRtoSpeech_2026-01-13-09-16-24.wav", type: "Branding" },
+  // ADDED NEW SAMPLES
+  { title: "Accent Russian (Halo my friend)", file: "https://github.com/Klik2/TTSPRO/blob/main/public/Te_eR_Halo_my_friend_PrivietMy__2026-01-16-19-20-04.wav?raw=true", type: "Accent" },
+  { title: "Accent UK (British)", file: "https://github.com/Klik2/TTSPRO/blob/main/public/Te_eR_Harry_Potter_is_enjoying__2026-01-15-11-57-44.wav?raw=true", type: "Accent" },
+  // UPDATED QORI PRIA
+  { title: "Murotal Qori Pria", file: "https://github.com/Klik2/TTSPRO/blob/0a224c95b984d66528cf2c1bbdac40e9346263d7/public/Te_eR_suara_sy_QS-18-1.wav?raw=true", type: "Qori" },
+  { title: "Murotal Qori Wanita", file: "https://github.com/Klik2/TTSPRO/blob/main/public/Te_eR_Quran_Surah_AlKahfi_18_1_2026-01-15-02-21-10.wav?raw=true", type: "Qori" },
 ];
 
 const STYLE_PRESETS_DATA = [
@@ -379,6 +385,8 @@ const VOICE_CATEGORIES_CONFIG = [
 const defaultApiKey = ""; // Used as fallback if user doesn't provide key
 
 // --- 2. UTILITY FUNCTIONS ---
+
+// ... (fetchWithRetry, base64ToArrayBuffer, pcmToWav, generateFilename remain the same)
 
 const fetchWithRetry = async (url: string, options: RequestInit, retries = 5, initialDelay = 1000): Promise<Response> => {
   let delay = initialDelay;
@@ -583,8 +591,6 @@ const CustomVoiceSelect = ({ selectedId, onChange, isDarkMode, customClones, t }
   );
 };
 
-
-// Tipe Data History
 interface HistoryItem {
   id: string;
   url: string;
@@ -601,15 +607,12 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
   const [activeAudioIndex, setActiveAudioIndex] = useState<number | null>(null);
   const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
 
-  // Default to Indonesian if translation missing (safety fallback)
   const t = TRANSLATIONS[language as keyof typeof TRANSLATIONS] || TRANSLATIONS.id;
 
   // SEO & Favicon Injection
   useEffect(() => {
-    // Title
     document.title = "Te_eR™ to Speech - Text to Bacot PRO";
     
-    // Meta Description
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
       metaDesc = document.createElement('meta');
@@ -618,7 +621,6 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
     }
     metaDesc.setAttribute('content', 'Aplikasi Text-to-Speech gratis terbaik. Ubah teks jadi suara dengan 50+ model suara, logat daerah, aksen negara, dan murotal. Supports Gemini & ElevenLabs.');
 
-    // Keywords
     let metaKeywords = document.querySelector('meta[name="keywords"]');
     if (!metaKeywords) {
       metaKeywords = document.createElement('meta');
@@ -627,7 +629,6 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
     }
     metaKeywords.setAttribute('content', 'text to speech, tts indonesia, logat daerah, voice cloning, suara google, elevenlabs free, gemini tts, murotal ai, text to bacot');
 
-    // Favicon Animation
     const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement || document.createElement('link');
     favicon.rel = 'icon';
     favicon.type = 'image/svg+xml';
@@ -838,9 +839,6 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
 
       <footer className={`py-10 border-t text-center ${isDarkMode ? 'border-white/5 bg-black' : 'border-slate-200 bg-slate-50'}`}>
         <div className="flex flex-col items-center gap-4">
-          <a href="mailto:hijrtime+ttspro@gmail.com" className={`flex items-center gap-2 px-5 py-2 rounded-full border text-sm font-bold transition-all hover:scale-105 ${isDarkMode ? 'border-white/10 hover:bg-white/10' : 'border-slate-300 hover:bg-slate-100'}`}>
-            <Mail className="w-4 h-4" /> {t.footerContact}
-          </a>
           <p className="text-xs font-mono text-cyan-500/50 animate-pulse tracking-[0.2em]">
             Te_eR™ Inovative @2026
           </p>
