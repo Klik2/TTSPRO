@@ -43,10 +43,13 @@ import {
   Mail,
   BookOpen,
   Map,
-  AlertTriangle
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Check
 } from 'lucide-react';
 
-// --- 1. DATA CONSTANTS (MOVED TO TOP FOR SAFETY) ---
+// --- 1. DATA CONSTANTS & UTILS ---
 
 const TARGET_LANGUAGES = [
   { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
@@ -69,38 +72,11 @@ const TARGET_LANGUAGES = [
   { code: 'af', name: 'Afrika', flag: '🇿🇦' },
 ];
 
-// STYLE PRESETS WITH TRANSLATION KEYS
-const STYLE_PRESETS_DATA = [
-  { id: "Netral", label_id: "Netral", label_en: "Neutral" },
-  { id: "Gembira", label_id: "Gembira", label_en: "Happy" },
-  { id: "Sedih", label_id: "Sedih", label_en: "Sad" },
-  { id: "Marah/Emosi", label_id: "Marah/Emosi", label_en: "Angry" },
-  { id: "Terkejut", label_id: "Terkejut", label_en: "Surprised" },
-  { id: "Bingung", label_id: "Bingung", label_en: "Confused" },
-  { id: "Galau", label_id: "Galau", label_en: "Upset" },
-  { id: "Berteriak", label_id: "Berteriak", label_en: "Shouting" },
-  { id: "Berbisik", label_id: "Berbisik", label_en: "Whispering" },
-  { id: "Tertawa", label_id: "Tertawa", label_en: "Laughing" },
-  { id: "Humoris", label_id: "Humoris", label_en: "Humorous" },
-  { id: "Menghela Nafas", label_id: "Menghela Nafas", label_en: "Sighing" },
-  { id: "Serius", label_id: "Serius", label_en: "Serious" },
-  { id: "Berita/News", label_id: "Berita/News", label_en: "Newscaster" },
-  { id: "Dongeng", label_id: "Dongeng", label_en: "Storytelling" },
-  { id: "Murotal", label_id: "Murotal", label_en: "Recitation" },
-  { id: "Sopran", label_id: "Sopran", label_en: "Soprano" },
-  { id: "Bass", label_id: "Bass", label_en: "Bass" },
-  { id: "Podcaster", label_id: "Podcaster", label_en: "Podcaster" },
-  { id: "Reporter", label_id: "Reporter", label_en: "Reporter" },
-  { id: "Tenor", label_id: "Tenor", label_en: "Tenor" },
-  { id: "Seriora", label_id: "Seriosa", label_en: "Opera" }
-];
-
 const TRANSLATIONS = {
   id: {
     tagline: "TEXT TO BACOT PRO",
     heroTitle1: "Ubah Teks Jadi",
     heroTitle2: "Suara",
-    heroDynamicText: "BERNYAWA",
     heroDesc: "Platform Text-to-Speech tercanggih dengan dukungan model suara aksen dari beberapa negara, logat daerah Indonesia, kloning suara, dan emosi yang nyata.",
     freeBadge: "GRATIS !*",
     startBtn: "Mulai Sekarang",
@@ -142,7 +118,19 @@ const TRANSLATIONS = {
     saveSettings: "Simpan Semua Pengaturan",
     warningNote: "Note : Harap di perhatikan untuk generate TTS yang mencantumkan API KEY GRATIS, penggunaannya JANGAN terlalu over generate, berikan jeda waktu min 3-5 menit untuk generate TTS selanjutnya untuk menghindari 'error' saat generate.",
     deleteHistory: "Hapus Semua",
-    downloadBtn: "Unduh"
+    downloadBtn: "Unduh",
+    cat_gemini: "Gemini Original",
+    cat_logat_pria: "Logat Daerah (Pria)",
+    cat_logat_wanita: "Logat Daerah (Wanita)",
+    cat_accent_male: "Accent Negara (Pria Dewasa)",
+    cat_accent_female: "Accent Negara (Wanita Dewasa)",
+    cat_accent_boy: "Accent Negara (Anak Laki-laki)",
+    cat_accent_girl: "Accent Negara (Anak Wanita)",
+    cat_tokoh: "Tokoh Publik & Selebriti",
+    cat_qori: "Murotal PRO (Qori)",
+    select_voice_placeholder: "Pilih Model Suara...",
+    installApp: "Install Aplikasi (PWA)",
+    installBtn: "Download App"
   },
   en: {
     tagline: "TEXT TO BACOT PRO",
@@ -190,7 +178,19 @@ const TRANSLATIONS = {
     saveSettings: "Save All Settings",
     warningNote: "Note: Please be aware for TTS generation using FREE API KEYS, do NOT over-generate. Allow a time gap of min 3-5 minutes for the next TTS generation to avoid errors.",
     deleteHistory: "Clear All",
-    downloadBtn: "Download"
+    downloadBtn: "Download",
+    cat_gemini: "Gemini Original",
+    cat_logat_pria: "Local Dialects (Male)",
+    cat_logat_wanita: "Local Dialects (Female)",
+    cat_accent_male: "Country Accents (Adult Male)",
+    cat_accent_female: "Country Accents (Adult Female)",
+    cat_accent_boy: "Country Accents (Young Boy)",
+    cat_accent_girl: "Country Accents (Young Girl)",
+    cat_tokoh: "Public Figures & Celebrities",
+    cat_qori: "Murotal PRO (Qori)",
+    select_voice_placeholder: "Select Voice Model...",
+    installApp: "Install App (PWA)",
+    installBtn: "Download App"
   }
 };
 
@@ -202,6 +202,23 @@ const AUDIO_SAMPLES = [
   { title: "Tagline Text-to-Bacot", file: "/Te_eR_Text_to_BacotTeeRtoSpeech_2026-01-13-09-16-24.wav", type: "Branding" },
 ];
 
+const STYLE_PRESETS_DATA = [
+  { id: "Netral", label_id: "Netral", label_en: "Neutral" },
+  { id: "Gembira", label_id: "Gembira", label_en: "Happy" },
+  { id: "Sedih", label_id: "Sedih", label_en: "Sad" },
+  { id: "Marah/Emosi", label_id: "Marah/Emosi", label_en: "Angry" },
+  { id: "Terkejut", label_id: "Terkejut", label_en: "Surprised" },
+  { id: "Murotal", label_id: "Murotal", label_en: "Recitation" },
+  { id: "Berita/News", label_id: "Berita/News", label_en: "Newscaster" },
+  { id: "Dongeng", label_id: "Dongeng", label_en: "Storytelling" },
+  { id: "Berbisik", label_id: "Berbisik", label_en: "Whispering" },
+  { id: "Tertawa", label_id: "Tertawa", label_en: "Laughing" },
+  { id: "Humoris", label_id: "Humoris", label_en: "Humorous" },
+  { id: "Sopran", label_id: "Sopran", label_en: "Soprano" },
+  { id: "Bass", label_id: "Bass", label_en: "Bass" },
+  { id: "Seriosa", label_id: "Seriosa", label_en: "Opera" }
+];
+
 const FALLBACK_SCRIPTS = [
   "Tes satu dua tiga, dicoba! Mic-nya aman kan gais? Suara saya terdengar jelas?",
   "Hari ini mendung, tapi hatiku tetap cerah secerah layar HP kamu saat melihat notifikasi gajian.",
@@ -211,11 +228,8 @@ const FALLBACK_SCRIPTS = [
 ];
 
 const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'female', promptContext: string }> = {
-  // Official
   "Kore": { baseVoice: "Kore", gender: "female", promptContext: "Normal" },
   "Fenrir": { baseVoice: "Fenrir", gender: "male", promptContext: "Normal" },
-  
-  // Daerah
   "Jawa_Generic_ID_01": { baseVoice: "Charon", gender: "male", promptContext: "Pria Jawa medok, santai tapi sopan" },
   "Betawi_Generic_ID_01": { baseVoice: "Orus", gender: "male", promptContext: "Pria Betawi, ceplas-ceplos, nada tinggi, 'gue-elo'" },
   "Batak_Generic_ID_01": { baseVoice: "Orus", gender: "male", promptContext: "Pria Batak, suara lantang, tegas, berwibawa, logat kuat" }, 
@@ -231,8 +245,6 @@ const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'femal
   "Jawa_Ngapak_ID_01": { baseVoice: "Kore", gender: "female", promptContext: "Mbak Jawa Ngapak (Banyumas/Tegal), logat ngapak medok, lucu, 'inyong'" },
   "Minang_Female_ID_01": { baseVoice: "Aoede", gender: "female", promptContext: "Uni Minang, logat Padang kental, tegas, cepat, 'awak'" },
   "Melayu_Generic_ID_01": { baseVoice: "Aoede", gender: "female", promptContext: "Mak Cik Melayu (Riau/Malaysia), logat mendayu-dayu, sangat sopan" },
-  
-  // Tokoh
   "Pres_Generic_ID": { baseVoice: "Charon", gender: "male", promptContext: "Pidato Presiden, lambat, sangat berwibawa, formal, jeda panjang" },
   "Komedi_Generic_ID": { baseVoice: "Puck", gender: "male", promptContext: "Komedian stand-up, nada bercanda, tertawa kecil, cepat" },
   "News_Generic_ID": { baseVoice: "Orus", gender: "male", promptContext: "Pembaca berita TV, formal, artikulasi sangat jelas, datar" },
@@ -243,8 +255,6 @@ const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'femal
   "Sport_Generic_ID": { baseVoice: "Orus", gender: "male", promptContext: "Komentator bola jebret, berteriak, histeris, sangat cepat" },
   "Fairy_Generic_ID": { baseVoice: "Aoede", gender: "female", promptContext: "Ibu Peri dongeng, keibuan, sangat lembut, magis" },
   "Villain_Generic_ID": { baseVoice: "Charon", gender: "male", promptContext: "Penjahat Anime, suara serak, mengerikan, jahat, tertawa licik" }, 
-  
-  // QORI (Updated Names)
   "Bayyati_Qori1": { baseVoice: "Charon", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, warm, soft, calm, like Qori Muhammad Siddiq Al-Minshawi" },
   "Bayyati_Qori2": { baseVoice: "Fenrir", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, clear, steady, like Qori Mahmoud Khalil Al-Hussary" },
   "Bayyati_Qori3": { baseVoice: "Zephyr", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, melodic, like Qori Muammar Z.A." },
@@ -279,33 +289,22 @@ createAccentMapping("Acc_Female", "Kore", "female", "Adult Female");
 createAccentMapping("Acc_Boy", "Puck", "male", "Young Boy (Child)");
 createAccentMapping("Acc_Girl", "Aoede", "female", "Young Girl (Child)");
 
-const VOICE_DATABASE_CATEGORIES = {
-  "Gemini Original": [
+const VOICE_CATEGORIES_CONFIG = [
+  { key: "cat_gemini", id: "Gemini Original", voices: [
     { name: "Kore (Wanita, Jernih)", id: "Kore" },
     { name: "Fenrir (Pria, Berat)", id: "Fenrir" },
     { name: "Puck (Pria, Ringan)", id: "Puck" },
     { name: "Zephyr (Pria, Tenang)", id: "Zephyr" },
     { name: "Charon (Pria, Deep)", id: "Charon" },
-  ],
-  "Murotal PRO (Qori)": [
-    { name: "Bayati Qori-1 (Hangat/Lembut)", id: "Bayyati_Qori1" },
-    { name: "Bayati Qori-2 (Tegas/Tenang)", id: "Bayyati_Qori2" },
-    { name: "Bayati Qori-3 (Melodious)", id: "Bayyati_Qori3" },
-    { name: "Hijaz Qori-1 (Tajam/Emosional)", id: "Hijaz_Qori1" },
-    { name: "Hijaz Qori-2 (Cepat/Dinamis)", id: "Hijaz_Qori2" },
-    { name: "Hijaz Qori-3 (Halus/Sedih)", id: "Hijaz_Qori3" },
-    { name: "Nahawand Qori-1 (Sedih/Dalam)", id: "Nahawand_Qori1" },
-    { name: "Nahawand Qori-2 (Dramatis)", id: "Nahawand_Qori2" },
-    { name: "Nahawand Qori-3 (Indah)", id: "Nahawand_Qori3" },
-  ],
-  "Logat Daerah (Pria)": [
+  ]},
+  { key: "cat_logat_pria", id: "Logat Daerah (Pria)", voices: [
     { name: "Mas Joko (Logat Jawa Medok)", id: "Jawa_Generic_ID_01" },
     { name: "Bang Jampang (Logat Betawi)", id: "Betawi_Generic_ID_01" },
     { name: "Tulang Batak (Tegas & Keras)", id: "Batak_Generic_ID_01" },
     { name: "Bli Wayan (Logat Bali)", id: "Bali_Generic_ID_01" },
     { name: "Uda Rizal (Logat Minang)", id: "Minang_Generic_ID_01" },
-  ],
-  "Logat Daerah (Wanita)": [
+  ]},
+  { key: "cat_logat_wanita", id: "Logat Daerah (Wanita)", voices: [
     { name: "Teteh Geulis (Logat Sunda Halus)", id: "Sunda_Generic_ID_01" }, 
     { name: "Parampuang (Logat Ambon)", id: "Ambon_Generic_ID_01" },
     { name: "Cut (Logat Aceh)", id: "Aceh_Generic_ID_01" },
@@ -316,36 +315,36 @@ const VOICE_DATABASE_CATEGORIES = {
     { name: "Mbak (Logat Jawa Ngapak)", id: "Jawa_Ngapak_ID_01" },
     { name: "Uni (Logat Minang)", id: "Minang_Female_ID_01" },
     { name: "Mak Cik (Logat Melayu)", id: "Melayu_Generic_ID_01" },
-  ],
-  "Accent Negara (Pria Dewasa)": [
+  ]},
+  { key: "cat_accent_male", id: "Accent Negara (Pria Dewasa)", voices: [
     { name: "Accent USA", id: "Acc_Male_USA" }, { name: "Accent UK", id: "Acc_Male_UK" }, { name: "Accent Aussie", id: "Acc_Male_Aussie" },
     { name: "Accent Rusia", id: "Acc_Male_Rusia" }, { name: "Accent France", id: "Acc_Male_France" }, { name: "Accent Spain", id: "Acc_Male_Spain" },
     { name: "Accent Italian", id: "Acc_Male_Italian" }, { name: "Accent Germany", id: "Acc_Male_Germany" }, { name: "Accent Latina", id: "Acc_Male_Latina" },
     { name: "Accent Middle East", id: "Acc_Male_MiddleEast" }, { name: "Accent Chinese", id: "Acc_Male_Chinese" }, { name: "Accent Hindi", id: "Acc_Male_Hindi" },
     { name: "Accent Melayu", id: "Acc_Male_Melayu" }, { name: "Accent Singapore", id: "Acc_Male_Singapore" }, { name: "Accent African", id: "Acc_Male_African" },
-  ],
-  "Accent Negara (Wanita Dewasa)": [
+  ]},
+  { key: "cat_accent_female", id: "Accent Negara (Wanita Dewasa)", voices: [
     { name: "Accent USA", id: "Acc_Female_USA" }, { name: "Accent UK", id: "Acc_Female_UK" }, { name: "Accent Aussie", id: "Acc_Female_Aussie" },
     { name: "Accent Rusia", id: "Acc_Female_Rusia" }, { name: "Accent France", id: "Acc_Female_France" }, { name: "Accent Spain", id: "Acc_Female_Spain" },
     { name: "Accent Italian", id: "Acc_Female_Italian" }, { name: "Accent Germany", id: "Acc_Female_Germany" }, { name: "Accent Latina", id: "Acc_Female_Latina" },
     { name: "Accent Middle East", id: "Acc_Female_MiddleEast" }, { name: "Accent Chinese", id: "Acc_Female_Chinese" }, { name: "Accent Hindi", id: "Acc_Female_Hindi" },
     { name: "Accent Melayu", id: "Acc_Female_Melayu" }, { name: "Accent Singapore", id: "Acc_Female_Singapore" }, { name: "Accent African", id: "Acc_Female_African" },
-  ],
-  "Accent Negara (Anak Laki-laki)": [
+  ]},
+  { key: "cat_accent_boy", id: "Accent Negara (Anak Laki-laki)", voices: [
     { name: "Accent USA", id: "Acc_Boy_USA" }, { name: "Accent UK", id: "Acc_Boy_UK" }, { name: "Accent Aussie", id: "Acc_Boy_Aussie" },
     { name: "Accent Rusia", id: "Acc_Boy_Rusia" }, { name: "Accent France", id: "Acc_Boy_France" }, { name: "Accent Spain", id: "Acc_Boy_Spain" },
     { name: "Accent Italian", id: "Acc_Boy_Italian" }, { name: "Accent Germany", id: "Acc_Boy_Germany" }, { name: "Accent Latina", id: "Acc_Boy_Latina" },
     { name: "Accent Middle East", id: "Acc_Boy_MiddleEast" }, { name: "Accent Chinese", id: "Acc_Boy_Chinese" }, { name: "Accent Hindi", id: "Acc_Boy_Hindi" },
     { name: "Accent Melayu", id: "Acc_Boy_Melayu" }, { name: "Accent Singapore", id: "Acc_Boy_Singapore" }, { name: "Accent African", id: "Acc_Boy_African" },
-  ],
-  "Accent Negara (Anak Wanita)": [
+  ]},
+  { key: "cat_accent_girl", id: "Accent Negara (Anak Wanita)", voices: [
     { name: "Accent USA", id: "Acc_Girl_USA" }, { name: "Accent UK", id: "Acc_Girl_UK" }, { name: "Accent Aussie", id: "Acc_Girl_Aussie" },
     { name: "Accent Rusia", id: "Acc_Girl_Rusia" }, { name: "Accent France", id: "Acc_Girl_France" }, { name: "Accent Spain", id: "Acc_Girl_Spain" },
     { name: "Accent Italian", id: "Acc_Girl_Italian" }, { name: "Accent Germany", id: "Acc_Girl_Germany" }, { name: "Accent Latina", id: "Acc_Girl_Latina" },
     { name: "Accent Middle East", id: "Acc_Girl_MiddleEast" }, { name: "Accent Chinese", id: "Acc_Girl_Chinese" }, { name: "Accent Hindi", id: "Acc_Girl_Hindi" },
     { name: "Accent Melayu", id: "Acc_Girl_Melayu" }, { name: "Accent Singapore", id: "Acc_Girl_Singapore" }, { name: "Accent African", id: "Acc_Girl_African" },
-  ],
-  "Tokoh Publik & Selebriti": [
+  ]},
+  { key: "cat_tokoh", id: "Tokoh Publik & Selebriti", voices: [
     { name: "Sang Presiden (Wibawa)", id: "Pres_Generic_ID" },
     { name: "Komedian Legend (Lucu)", id: "Komedi_Generic_ID" },
     { name: "Host Berita Malam (Formal)", id: "News_Generic_ID" },
@@ -356,12 +355,73 @@ const VOICE_DATABASE_CATEGORIES = {
     { name: "Komentator Bola (Teriak)", id: "Sport_Generic_ID" },
     { name: "Ibu Peri (Dongeng)", id: "Fairy_Generic_ID" },
     { name: "Villain Anime (Jahat)", id: "Villain_Generic_ID" },
-  ]
+  ]},
+  { key: "cat_qori", id: "Murotal PRO (Qori)", voices: [
+    { name: "Bayati Qori-1 (Hangat/Lembut)", id: "Bayyati_Qori1" },
+    { name: "Bayati Qori-2 (Tegas/Tenang)", id: "Bayyati_Qori2" },
+    { name: "Bayati Qori-3 (Melodious)", id: "Bayyati_Qori3" },
+    { name: "Hijaz Qori-1 (Tajam/Emosional)", id: "Hijaz_Qori1" },
+    { name: "Hijaz Qori-2 (Cepat/Dinamis)", id: "Hijaz_Qori2" },
+    { name: "Hijaz Qori-3 (Halus/Sedih)", id: "Hijaz_Qori3" },
+    { name: "Nahawand Qori-1 (Sedih/Dalam)", id: "Nahawand_Qori1" },
+    { name: "Nahawand Qori-2 (Dramatis)", id: "Nahawand_Qori2" },
+    { name: "Nahawand Qori-3 (Indah)", id: "Nahawand_Qori3" },
+  ]},
+];
+
+const defaultApiKey = ""; 
+
+const base64ToArrayBuffer = (base64: string) => {
+  const binaryString = window.atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
 };
 
-const defaultApiKey = ""; // Used as fallback if user doesn't provide key
+const pcmToWav = (pcmData: ArrayBuffer, sampleRate: number = 24000) => {
+  const numChannels = 1;
+  const byteRate = sampleRate * numChannels * 2;
+  const blockAlign = numChannels * 2;
+  const dataSize = pcmData.byteLength;
+  const buffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(buffer);
 
-// --- 2. UTILITY FUNCTIONS ---
+  const writeString = (offset: number, string: string) => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  };
+
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); 
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, 16, true); 
+  writeString(36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  const pcmBytes = new Uint8Array(pcmData);
+  const wavBytes = new Uint8Array(buffer, 44);
+  wavBytes.set(pcmBytes);
+
+  return buffer;
+};
+
+const generateFilename = (text: string) => {
+  const cleanText = text.replace(/[^a-zA-Z0-9 ]/g, "").trim();
+  const truncated = cleanText.substring(0, 25).replace(/\s+/g, "_");
+  const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  return `Te_eR_${truncated}_${timestamp}.wav`;
+};
 
 const fetchWithRetry = async (url: string, options: RequestInit, retries = 5, initialDelay = 1000): Promise<Response> => {
   let delay = initialDelay;
@@ -385,9 +445,134 @@ const fetchWithRetry = async (url: string, options: RequestInit, retries = 5, in
   throw new Error("Max retries reached");
 };
 
-// --- 3. COMPONENTS ---
 
-// Tipe Data History
+// Custom Dropdown Component
+const CustomVoiceSelect = ({ selectedId, onChange, isDarkMode, customClones, t }: any) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleCategory = (catKey: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenCategory(openCategory === catKey ? null : catKey);
+  };
+
+  const handleSelect = (voiceId: string) => {
+    onChange(voiceId);
+    setIsOpen(false);
+  };
+
+  let selectedName = t.select_voice_placeholder;
+  const custom = customClones.find((c: any) => c.id === selectedId);
+  if (custom) selectedName = custom.name;
+  else {
+    for (const cat of VOICE_CATEGORIES_CONFIG) {
+      const found = cat.voices.find(v => v.id === selectedId);
+      if (found) {
+        selectedName = found.name;
+        break;
+      }
+    }
+  }
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full border rounded-xl px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${
+          isDarkMode 
+            ? 'bg-neutral-950 border-white/10 text-white hover:border-lime-500' 
+            : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-blue-500'
+        }`}
+      >
+        <span className="truncate text-sm">{selectedName}</span>
+        {isOpen ? <ChevronUp className="w-4 h-4 opacity-50" /> : <ChevronDown className="w-4 h-4 opacity-50" />}
+      </div>
+
+      {isOpen && (
+        <div className={`absolute z-50 w-full mt-2 rounded-xl shadow-2xl border overflow-hidden max-h-[400px] overflow-y-auto custom-scrollbar ${
+          isDarkMode ? 'bg-neutral-900 border-white/10' : 'bg-white border-slate-200'
+        }`}>
+          {customClones.length > 0 && (
+            <div className="border-b border-white/5 last:border-0">
+               <div 
+                  onClick={(e) => toggleCategory("custom", e)}
+                  className={`px-4 py-3 text-xs font-bold uppercase tracking-wider flex justify-between items-center cursor-pointer ${
+                    isDarkMode ? 'bg-neutral-800/50 text-lime-400 hover:bg-neutral-800' : 'bg-slate-50 text-blue-600 hover:bg-slate-100'
+                  }`}
+               >
+                  {t.recSavedTitle}
+                  {openCategory === "custom" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+               </div>
+               {openCategory === "custom" && (
+                 <div className={isDarkMode ? 'bg-black/20' : 'bg-slate-50/50'}>
+                    {customClones.map((c: any) => (
+                      <div 
+                        key={c.id} 
+                        onClick={() => handleSelect(c.id)}
+                        className={`px-6 py-2.5 text-sm cursor-pointer flex items-center justify-between ${
+                          selectedId === c.id 
+                            ? (isDarkMode ? 'text-lime-400 bg-lime-500/10' : 'text-blue-600 bg-blue-50') 
+                            : (isDarkMode ? 'text-neutral-300 hover:bg-white/5' : 'text-slate-700 hover:bg-slate-100')
+                        }`}
+                      >
+                        {c.name}
+                        {selectedId === c.id && <Check className="w-3 h-3" />}
+                      </div>
+                    ))}
+                 </div>
+               )}
+            </div>
+          )}
+
+          {VOICE_CATEGORIES_CONFIG.map((cat) => (
+            <div key={cat.key} className={`border-b last:border-0 ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+              <div 
+                  onClick={(e) => toggleCategory(cat.key, e)}
+                  className={`px-4 py-3 text-xs font-bold uppercase tracking-wider flex justify-between items-center cursor-pointer ${
+                    isDarkMode ? 'hover:bg-white/5 text-neutral-400' : 'hover:bg-slate-50 text-slate-500'
+                  }`}
+               >
+                  {t[cat.key] || cat.id} 
+                  {openCategory === cat.key ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+               </div>
+
+               {openCategory === cat.key && (
+                 <div className={isDarkMode ? 'bg-black/20' : 'bg-slate-50/50'}>
+                    {cat.voices.map((v) => (
+                      <div 
+                        key={v.id} 
+                        onClick={() => handleSelect(v.id)}
+                        className={`px-6 py-2.5 text-sm cursor-pointer flex items-center justify-between ${
+                          selectedId === v.id 
+                            ? (isDarkMode ? 'text-lime-400 bg-lime-500/10' : 'text-blue-600 bg-blue-50') 
+                            : (isDarkMode ? 'text-neutral-300 hover:bg-white/5' : 'text-slate-700 hover:bg-slate-100')
+                        }`}
+                      >
+                        {v.name}
+                        {selectedId === v.id && <Check className="w-3 h-3" />}
+                      </div>
+                    ))}
+                 </div>
+               )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 interface HistoryItem {
   id: string;
   url: string;
@@ -404,7 +589,6 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
   const [activeAudioIndex, setActiveAudioIndex] = useState<number | null>(null);
   const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
 
-  // Default to Indonesian if translation missing (safety fallback)
   const t = TRANSLATIONS[language as keyof typeof TRANSLATIONS] || TRANSLATIONS.id;
 
   useEffect(() => {
@@ -413,7 +597,7 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
   }, []);
 
   useEffect(() => {
-    setTypedText(""); // Reset text when language changes
+    setTypedText(""); 
     let index = 0;
     const typeInterval = setInterval(() => {
       if (index <= fullText.length) {
@@ -424,7 +608,7 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
       }
     }, 200);
     return () => clearInterval(typeInterval);
-  }, [fullText]); // Re-run effect when fullText changes
+  }, [fullText]);
 
   const handlePlaySample = (index: number) => {
     audioRefs.current.forEach((audio, i) => {
@@ -614,11 +798,9 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
   );
 };
 
-// --- MAIN APP COMPONENT ---
-
 const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
   const [activeTab, setActiveTab] = useState<'gemini' | 'elevenlabs'>('gemini');
-  const [text, setText] = useState<string>(""); // Started empty to show placeholder
+  const [text, setText] = useState<string>(""); 
   const [isLoading, setIsLoading] = useState(false);
   const [showSpeakerIcon, setShowSpeakerIcon] = useState(false);
   
@@ -783,10 +965,11 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
            mapping = { baseVoice: "Fenrir", promptContext: "Tirukan gaya bicara natural" };
         } else {
            mapping = VOICE_MAPPING[geminiVoiceId] || { baseVoice: "Kore", promptContext: "" };
-           Object.values(VOICE_DATABASE_CATEGORIES).forEach(list => {
-             const found = list.find(v => v.id === geminiVoiceId);
-             if (found) displayName = found.name;
-           });
+           // Find display name in categories
+           for (const cat of VOICE_CATEGORIES_CONFIG) {
+              const found = cat.voices.find(v => v.id === geminiVoiceId);
+              if (found) { displayName = found.name; break; }
+           }
         }
         
         usedVoiceName = displayName;
@@ -967,17 +1150,16 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
                 <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-300">
                   <div className="space-y-2">
                     <label className={`text-sm block ${colors.textMuted}`}>{t.voiceModelLabel}</label>
-                    <div className="relative">
-                      <select value={geminiVoiceId} onChange={(e) => setGeminiVoiceId(e.target.value)} className={`w-full border rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-opacity-100 transition-colors cursor-pointer text-sm ${isDarkMode ? 'bg-neutral-950 border-white/10 text-white focus:border-lime-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-500'}`}>
-                         {customClones.length > 0 && <optgroup label={t.recSavedTitle} className={isDarkMode ? "bg-neutral-900" : "bg-white"}>{customClones.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</optgroup>}
-                         {Object.entries(VOICE_DATABASE_CATEGORIES).map(([category, voices]) => (
-                          <optgroup key={category} label={category} className={isDarkMode ? "bg-neutral-900 text-lime-300" : "bg-white text-blue-600 font-bold"}>
-                            {voices.map(v => <option key={v.id} value={v.id} className={isDarkMode ? "text-white" : "text-slate-800 font-normal"}>{v.name}</option>)}
-                          </optgroup>
-                        ))}
-                      </select>
-                      <div className={`absolute right-4 top-3.5 pointer-events-none ${colors.textMuted}`}>▼</div>
-                    </div>
+                    
+                    {/* CUSTOM DROPDOWN COMPONENT */}
+                    <CustomVoiceSelect 
+                        selectedId={geminiVoiceId}
+                        onChange={setGeminiVoiceId}
+                        isDarkMode={isDarkMode}
+                        customClones={customClones}
+                        t={t}
+                    />
+
                   </div>
                   <div className="space-y-2">
                     <label className={`text-sm block ${colors.textMuted}`}>{t.styleLabel}</label>
@@ -1188,6 +1370,22 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
                   <div className="relative"><input type="password" value={elevenLabsApiKey} onChange={(e) => setElevenLabsApiKey(e.target.value)} placeholder="Paste Key..." className={`w-full p-3 rounded-xl border focus:outline-none transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} /><div className="absolute right-3 top-3 group cursor-help"><HelpCircle className={`w-4 h-4 ${colors.textMuted}`} /><div className="hidden group-hover:block absolute right-0 bottom-6 w-48 p-2 bg-black text-white text-[10px] rounded shadow-lg z-50">Untuk fitur Pro Voice Cloning.</div></div></div>
                 </div>
               </div>
+
+              {/* Install PWA Button in Settings */}
+              {deferredPrompt && (
+                <div className={`flex items-center justify-between p-4 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
+                   <div className="flex items-center gap-2"><Smartphone className={`w-4 h-4 ${colors.accent}`} /><span className="text-sm font-bold">{t.installApp}</span></div>
+                   <button 
+                      onClick={() => {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then(() => setDeferredPrompt(null));
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${isDarkMode ? 'bg-neutral-800 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-800 shadow-sm'}`}
+                   >
+                      {t.installBtn}
+                   </button>
+                </div>
+              )}
 
               <button onClick={saveSettings} className={`w-full font-medium py-3 rounded-xl flex items-center justify-center gap-2 mt-4 transition-colors text-white ${isDarkMode ? 'bg-green-600 hover:bg-green-500' : 'bg-green-500 hover:bg-green-400 shadow-lg'}`}><Save className="w-4 h-4" /> {t.saveSettings}</button>
             </div>
