@@ -49,7 +49,7 @@ import {
   Check
 } from 'lucide-react';
 
-// --- 1. DATA CONSTANTS & UTILS ---
+// --- 1. DATA CONSTANTS ---
 
 const TARGET_LANGUAGES = [
   { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
@@ -130,7 +130,7 @@ const TRANSLATIONS = {
     cat_qori: "Murotal PRO (Qori)",
     select_voice_placeholder: "Pilih Model Suara...",
     installApp: "Install Aplikasi (PWA)",
-    installBtn: "Download App"
+    installBtn: "Download / Install App"
   },
   en: {
     tagline: "TEXT TO BACOT PRO",
@@ -190,7 +190,7 @@ const TRANSLATIONS = {
     cat_qori: "Murotal PRO (Qori)",
     select_voice_placeholder: "Select Voice Model...",
     installApp: "Install App (PWA)",
-    installBtn: "Download App"
+    installBtn: "Download / Install App"
   }
 };
 
@@ -228,8 +228,11 @@ const FALLBACK_SCRIPTS = [
 ];
 
 const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'female', promptContext: string }> = {
+  // Official
   "Kore": { baseVoice: "Kore", gender: "female", promptContext: "Normal" },
   "Fenrir": { baseVoice: "Fenrir", gender: "male", promptContext: "Normal" },
+  
+  // Daerah
   "Jawa_Generic_ID_01": { baseVoice: "Charon", gender: "male", promptContext: "Pria Jawa medok, santai tapi sopan" },
   "Betawi_Generic_ID_01": { baseVoice: "Orus", gender: "male", promptContext: "Pria Betawi, ceplas-ceplos, nada tinggi, 'gue-elo'" },
   "Batak_Generic_ID_01": { baseVoice: "Orus", gender: "male", promptContext: "Pria Batak, suara lantang, tegas, berwibawa, logat kuat" }, 
@@ -245,6 +248,8 @@ const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'femal
   "Jawa_Ngapak_ID_01": { baseVoice: "Kore", gender: "female", promptContext: "Mbak Jawa Ngapak (Banyumas/Tegal), logat ngapak medok, lucu, 'inyong'" },
   "Minang_Female_ID_01": { baseVoice: "Aoede", gender: "female", promptContext: "Uni Minang, logat Padang kental, tegas, cepat, 'awak'" },
   "Melayu_Generic_ID_01": { baseVoice: "Aoede", gender: "female", promptContext: "Mak Cik Melayu (Riau/Malaysia), logat mendayu-dayu, sangat sopan" },
+  
+  // Tokoh
   "Pres_Generic_ID": { baseVoice: "Charon", gender: "male", promptContext: "Pidato Presiden, lambat, sangat berwibawa, formal, jeda panjang" },
   "Komedi_Generic_ID": { baseVoice: "Puck", gender: "male", promptContext: "Komedian stand-up, nada bercanda, tertawa kecil, cepat" },
   "News_Generic_ID": { baseVoice: "Orus", gender: "male", promptContext: "Pembaca berita TV, formal, artikulasi sangat jelas, datar" },
@@ -255,6 +260,8 @@ const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'femal
   "Sport_Generic_ID": { baseVoice: "Orus", gender: "male", promptContext: "Komentator bola jebret, berteriak, histeris, sangat cepat" },
   "Fairy_Generic_ID": { baseVoice: "Aoede", gender: "female", promptContext: "Ibu Peri dongeng, keibuan, sangat lembut, magis" },
   "Villain_Generic_ID": { baseVoice: "Charon", gender: "male", promptContext: "Penjahat Anime, suara serak, mengerikan, jahat, tertawa licik" }, 
+  
+  // QORI
   "Bayyati_Qori1": { baseVoice: "Charon", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, warm, soft, calm, like Qori Muhammad Siddiq Al-Minshawi" },
   "Bayyati_Qori2": { baseVoice: "Fenrir", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, clear, steady, like Qori Mahmoud Khalil Al-Hussary" },
   "Bayyati_Qori3": { baseVoice: "Zephyr", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, melodic, like Qori Muammar Z.A." },
@@ -369,7 +376,31 @@ const VOICE_CATEGORIES_CONFIG = [
   ]},
 ];
 
-const defaultApiKey = ""; 
+const defaultApiKey = ""; // Used as fallback if user doesn't provide key
+
+// --- 2. UTILITY FUNCTIONS ---
+
+const fetchWithRetry = async (url: string, options: RequestInit, retries = 5, initialDelay = 1000): Promise<Response> => {
+  let delay = initialDelay;
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return response;
+      if (response.status === 401 || response.status === 403) throw new Error("API Key Invalid");
+      if (response.status === 400) {
+         const err = await response.json().catch(() => ({}));
+         console.error("Bad Request:", err);
+         throw new Error("Parameter Salah (Voice/Prompt) atau Request Ditolak.");
+      }
+      throw new Error(`HTTP Error ${response.status}`);
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await new Promise(resolve => setTimeout(resolve, delay));
+      delay *= 2; 
+    }
+  }
+  throw new Error("Max retries reached");
+};
 
 const base64ToArrayBuffer = (base64: string) => {
   const binaryString = window.atob(base64);
@@ -423,28 +454,7 @@ const generateFilename = (text: string) => {
   return `Te_eR_${truncated}_${timestamp}.wav`;
 };
 
-const fetchWithRetry = async (url: string, options: RequestInit, retries = 5, initialDelay = 1000): Promise<Response> => {
-  let delay = initialDelay;
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url, options);
-      if (response.ok) return response;
-      if (response.status === 401 || response.status === 403) throw new Error("API Key Invalid");
-      if (response.status === 400) {
-         const err = await response.json().catch(() => ({}));
-         console.error("Bad Request:", err);
-         throw new Error("Parameter Salah (Voice/Prompt) atau Request Ditolak.");
-      }
-      throw new Error(`HTTP Error ${response.status}`);
-    } catch (err) {
-      if (i === retries - 1) throw err;
-      await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 2; 
-    }
-  }
-  throw new Error("Max retries reached");
-};
-
+// --- 3. COMPONENTS ---
 
 // Custom Dropdown Component
 const CustomVoiceSelect = ({ selectedId, onChange, isDarkMode, customClones, t }: any) => {
@@ -573,6 +583,8 @@ const CustomVoiceSelect = ({ selectedId, onChange, isDarkMode, customClones, t }
   );
 };
 
+
+// Tipe Data History
 interface HistoryItem {
   id: string;
   url: string;
@@ -589,7 +601,47 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
   const [activeAudioIndex, setActiveAudioIndex] = useState<number | null>(null);
   const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
 
+  // Default to Indonesian if translation missing (safety fallback)
   const t = TRANSLATIONS[language as keyof typeof TRANSLATIONS] || TRANSLATIONS.id;
+
+  // SEO & Favicon Injection
+  useEffect(() => {
+    // Title
+    document.title = "Te_eR™ to Speech - Text to Bacot PRO";
+    
+    // Meta Description
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.setAttribute('name', 'description');
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute('content', 'Aplikasi Text-to-Speech gratis terbaik. Ubah teks jadi suara dengan 50+ model suara, logat daerah, aksen negara, dan murotal. Supports Gemini & ElevenLabs.');
+
+    // Keywords
+    let metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (!metaKeywords) {
+      metaKeywords = document.createElement('meta');
+      metaKeywords.setAttribute('name', 'keywords');
+      document.head.appendChild(metaKeywords);
+    }
+    metaKeywords.setAttribute('content', 'text to speech, tts indonesia, logat daerah, voice cloning, suara google, elevenlabs free, gemini tts, murotal ai, text to bacot');
+
+    // Favicon Animation
+    const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement || document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.type = 'image/svg+xml';
+    document.head.appendChild(favicon);
+
+    let toggle = false;
+    const interval = setInterval(() => {
+      const icon = toggle ? '🗣️' : '🔊';
+      favicon.href = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${icon}</text></svg>`;
+      toggle = !toggle;
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => setLogoSwitch(prev => !prev), 3000);
@@ -797,6 +849,8 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
     </div>
   );
 };
+
+// --- MAIN APP COMPONENT ---
 
 const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
   const [activeTab, setActiveTab] = useState<'gemini' | 'elevenlabs'>('gemini');
