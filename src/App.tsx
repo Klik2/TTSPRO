@@ -39,102 +39,183 @@ import {
   Infinity,
   Mic2,
   Layers,
-  Smile
+  Smile,
+  Mail,
+  BookOpen,
+  Map,
+  AlertTriangle
 } from 'lucide-react';
 
-// --- UTILITY FUNCTIONS (GLOBAL) ---
+// --- 1. DATA CONSTANTS (MOVED TO TOP FOR SAFETY) ---
 
-const base64ToArrayBuffer = (base64: string) => {
-  const binaryString = window.atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+const TARGET_LANGUAGES = [
+  { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
+  { code: 'en', name: 'Inggris', flag: '🇬🇧' },
+  { code: 'ar', name: 'Arab', flag: '🇸🇦' },
+  { code: 'ru', name: 'Rusia', flag: '🇷🇺' },
+  { code: 'de', name: 'Jerman', flag: '🇩🇪' },
+  { code: 'fr', name: 'Perancis', flag: '🇫🇷' },
+  { code: 'es', name: 'Spanyol', flag: '🇪🇸' },
+  { code: 'pt', name: 'Portugis', flag: '🇵🇹' },
+  { code: 'it', name: 'Italia', flag: '🇮🇹' },
+  { code: 'tr', name: 'Turki', flag: '🇹🇷' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'ja', name: 'Jepang', flag: '🇯🇵' },
+  { code: 'ko', name: 'Korea', flag: '🇰🇷' },
+  { code: 'hi', name: 'India', flag: '🇮🇳' },
+  { code: 'th', name: 'Thailand', flag: '🇹🇭' },
+  { code: 'vi', name: 'Vietnam', flag: '🇻🇳' },
+  { code: 'tl', name: 'Tagalog', flag: '🇵🇭' },
+  { code: 'af', name: 'Afrika', flag: '🇿🇦' },
+];
+
+// STYLE PRESETS WITH TRANSLATION KEYS
+const STYLE_PRESETS_DATA = [
+  { id: "Netral", label_id: "Netral", label_en: "Neutral" },
+  { id: "Gembira", label_id: "Gembira", label_en: "Happy" },
+  { id: "Sedih", label_id: "Sedih", label_en: "Sad" },
+  { id: "Marah/Emosi", label_id: "Marah/Emosi", label_en: "Angry" },
+  { id: "Terkejut", label_id: "Terkejut", label_en: "Surprised" },
+  { id: "Bingung", label_id: "Bingung", label_en: "Confused" },
+  { id: "Galau", label_id: "Galau", label_en: "Upset" },
+  { id: "Berteriak", label_id: "Berteriak", label_en: "Shouting" },
+  { id: "Berbisik", label_id: "Berbisik", label_en: "Whispering" },
+  { id: "Tertawa", label_id: "Tertawa", label_en: "Laughing" },
+  { id: "Humoris", label_id: "Humoris", label_en: "Humorous" },
+  { id: "Menghela Nafas", label_id: "Menghela Nafas", label_en: "Sighing" },
+  { id: "Serius", label_id: "Serius", label_en: "Serious" },
+  { id: "Berita/News", label_id: "Berita/News", label_en: "Newscaster" },
+  { id: "Dongeng", label_id: "Dongeng", label_en: "Storytelling" },
+  { id: "Murotal", label_id: "Murotal", label_en: "Recitation" },
+  { id: "Sopran", label_id: "Sopran", label_en: "Soprano" },
+  { id: "Bass", label_id: "Bass", label_en: "Bass" },
+  { id: "Podcaster", label_id: "Podcaster", label_en: "Podcaster" },
+  { id: "Reporter", label_id: "Reporter", label_en: "Reporter" },
+  { id: "Tenor", label_id: "Tenor", label_en: "Tenor" },
+  { id: "Seriora", label_id: "Seriosa", label_en: "Opera" }
+];
+
+const TRANSLATIONS = {
+  id: {
+    tagline: "TEXT TO BACOT PRO",
+    heroTitle1: "Ubah Teks Jadi",
+    heroTitle2: "Suara",
+    heroDynamicText: "BERNYAWA",
+    heroDesc: "Platform Text-to-Speech tercanggih dengan dukungan model suara aksen dari beberapa negara, logat daerah Indonesia, kloning suara, dan emosi yang nyata.",
+    freeBadge: "GRATIS !*",
+    startBtn: "Mulai Sekarang",
+    poweredBy: "Powered by",
+    feature1: "50+ Model Suara", feature1Desc: "Termasuk aksen negara & logat daerah.",
+    feature2: "Kaya Emosi", feature2Desc: "Atur intonasi: Gembira, Sedih, Marah.",
+    feature3: "Voice Cloning", feature3Desc: "Rekam & tirukan suara Anda sendiri.",
+    feature4: "Tanpa Batas", feature4Desc: "Generate sepuasnya & download langsung.",
+    feature5: "Tampilan Adaptif", feature5Desc: "Mode Gelap & Terang yang nyaman.",
+    feature6: "Auto Translate", feature6Desc: "Terjemahkan skrip ke berbagai bahasa.",
+    feature7: "Mode Qori Pro", feature7Desc: "Bayyati, Hijaz, Nahawand untuk Murotal.",
+    feature8: "Aksen Global", feature8Desc: "Suara bule USA, UK, Arab, hingga China.",
+    showcaseTitle: "Dengar Hasil Suara",
+    ctaTitle: "Siap Membuat Konten Bersuara?",
+    ctaBtn1: "Kuy Mulai",
+    ctaBtn2: "BACOT",
+    footerContact: "Contact us",
+    configTitle: "Konfigurasi Suara",
+    voiceModelLabel: "Model Suara PRO (50+ Archetypes)",
+    styleLabel: "Instruksi Gaya/Emosi",
+    stylePlaceholder: "Contoh: Sedih, Marah, Murotal...",
+    recTitle: "Rekam Suara (Cloning)",
+    recStart: "Mulai Rekam",
+    recStop: "Stop",
+    recSave: "Simpan",
+    recSavedTitle: "✨ Rekaman Tersimpan (Lokal)",
+    editorTitle: "SCRIPT EDITOR",
+    autoWrite: "Tulis Otomatis",
+    editorPlaceholder: "Ketik teks yang ingin diubah menjadi suara di sini...",
+    generateBtn: "Buat Suara Sekarang",
+    processing: "Memproses Suara...",
+    libraryTitle: "Library dan History",
+    settingsTitle: "Pengaturan",
+    translateTitle: "Translate (Gratis via Gemini)",
+    targetLangLabel: "Bahasa Tujuan",
+    translateBtn: "Terjemahkan Teks Editor",
+    themeLabel: "Mode Tampilan",
+    apiKeyLabel: "API Keys",
+    saveSettings: "Simpan Semua Pengaturan",
+    warningNote: "Note : Harap di perhatikan untuk generate TTS yang mencantumkan API KEY GRATIS, penggunaannya JANGAN terlalu over generate, berikan jeda waktu min 3-5 menit untuk generate TTS selanjutnya untuk menghindari 'error' saat generate.",
+    deleteHistory: "Hapus Semua",
+    downloadBtn: "Unduh"
+  },
+  en: {
+    tagline: "TEXT TO BACOT PRO",
+    heroTitle1: "Turn Text Into",
+    heroTitle2: "Sound",
+    heroDynamicText: "OF LIFE",
+    heroDesc: "The most advanced Text-to-Speech platform with support for international accents, Indonesian local dialects, voice cloning, and real emotions.",
+    freeBadge: "FREE !*",
+    startBtn: "Start Now",
+    poweredBy: "Powered by",
+    feature1: "50+ Voice Models", feature1Desc: "Includes country accents & local dialects.",
+    feature2: "Rich Emotions", feature2Desc: "Set intonation: Happy, Sad, Angry.",
+    feature3: "Voice Cloning", feature3Desc: "Record & mimic your own voice.",
+    feature4: "Unlimited", feature4Desc: "Generate freely & download instantly.",
+    feature5: "Adaptive UI", feature5Desc: "Comfortable Dark & Light modes.",
+    feature6: "Auto Translate", feature6Desc: "Translate scripts to various languages.",
+    feature7: "Qori Pro Mode", feature7Desc: "Bayyati, Hijaz, Nahawand for Recitation.",
+    feature8: "Global Accents", feature8Desc: "USA, UK, Arab, Chinese accents & more.",
+    showcaseTitle: "Listen to Results",
+    ctaTitle: "Ready to Create Voiced Content?",
+    ctaBtn1: "Let's Start",
+    ctaBtn2: "TALKING",
+    footerContact: "Contact us",
+    configTitle: "Voice Configuration",
+    voiceModelLabel: "Voice Model PRO (50+ Archetypes)",
+    styleLabel: "Style/Emotion Instruction",
+    stylePlaceholder: "E.g., Sad, Angry, Recitation...",
+    recTitle: "Voice Recording (Cloning)",
+    recStart: "Start Rec",
+    recStop: "Stop",
+    recSave: "Save",
+    recSavedTitle: "✨ Saved Recordings (Local)",
+    editorTitle: "SCRIPT EDITOR",
+    autoWrite: "Auto Write",
+    editorPlaceholder: "Type text to convert to speech here...",
+    generateBtn: "Generate Voice Now",
+    processing: "Processing Voice...",
+    libraryTitle: "Library and History",
+    settingsTitle: "Settings",
+    translateTitle: "Translate (Free via Gemini)",
+    targetLangLabel: "Target Language",
+    translateBtn: "Translate Editor Text",
+    themeLabel: "Display Mode",
+    apiKeyLabel: "API Keys",
+    saveSettings: "Save All Settings",
+    warningNote: "Note: Please be aware for TTS generation using FREE API KEYS, do NOT over-generate. Allow a time gap of min 3-5 minutes for the next TTS generation to avoid errors.",
+    deleteHistory: "Clear All",
+    downloadBtn: "Download"
   }
-  return bytes.buffer;
 };
 
-const pcmToWav = (pcmData: ArrayBuffer, sampleRate: number = 24000) => {
-  const numChannels = 1;
-  const byteRate = sampleRate * numChannels * 2;
-  const blockAlign = numChannels * 2;
-  const dataSize = pcmData.byteLength;
-  const buffer = new ArrayBuffer(44 + dataSize);
-  const view = new DataView(buffer);
-
-  const writeString = (offset: number, string: string) => {
-    for (let i = 0; i < string.length; i++) {
-      view.setUint8(offset + i, string.charCodeAt(i));
-    }
-  };
-
-  writeString(0, 'RIFF');
-  view.setUint32(4, 36 + dataSize, true);
-  writeString(8, 'WAVE');
-  writeString(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true); 
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, byteRate, true);
-  view.setUint16(32, blockAlign, true);
-  view.setUint16(34, 16, true); 
-  writeString(36, 'data');
-  view.setUint32(40, dataSize, true);
-
-  const pcmBytes = new Uint8Array(pcmData);
-  const wavBytes = new Uint8Array(buffer, 44);
-  wavBytes.set(pcmBytes);
-
-  return buffer;
-};
-
-const generateFilename = (text: string) => {
-  const cleanText = text.replace(/[^a-zA-Z0-9 ]/g, "").trim();
-  const truncated = cleanText.substring(0, 25).replace(/\s+/g, "_");
-  const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-  return `Te_eR_${truncated}_${timestamp}.wav`;
-};
-
-const fetchWithRetry = async (url: string, options: RequestInit, retries = 5, initialDelay = 1000): Promise<Response> => {
-  let delay = initialDelay;
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url, options);
-      if (response.ok) return response;
-      if (response.status === 401 || response.status === 403) throw new Error("API Key Invalid");
-      if (response.status === 400) {
-         const err = await response.json().catch(() => ({}));
-         console.error("Bad Request:", err);
-         throw new Error("Parameter Salah (Voice/Prompt) atau Request Ditolak.");
-      }
-      throw new Error(`HTTP Error ${response.status}`);
-    } catch (err) {
-      if (i === retries - 1) throw err;
-      await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 2; 
-    }
-  }
-  throw new Error("Max retries reached");
-};
-
-// --- DATA & CONFIGURATIONS ---
-
-const defaultApiKey = ""; // Variabel ini akan diisi otomatis oleh sistem saat runtime.
-
-// NOTE: Karena ini adalah pratinjau statis, file audio lokal tidak dapat dimuat.
-// URL di bawah ini adalah placeholder. Dalam produksi nyata, ganti dengan URL file yang benar (misal di folder /public)
 const AUDIO_SAMPLES = [
-  { title: "Intro & Pengumuman (Formal)", file: "/Te_eR_Halo_saya_resmi_mengumumk_2026-01-13-23-37-06.wav", type: "News" }, 
-  { title: "Nada Lucu & Witty", file: "/Te_eR_Nada_Lucu_dan_Witty_Inton_2026-01-13-22-06-47.wav", type: "Fun" }, 
-  { title: "Demo Suara Natural", file: "/Te_eR_Halo_ini_adalah_contoh_te_2026-01-13-21-54-44.wav", type: "Casual" }, 
-  { title: "Doa & Murotal (Spiritual)", file: "/Te_eR_Doa_Meminta_Ampunan_Allah_2026-01-13-10-21-38.wav", type: "Murotal" }, 
-  { title: "Tagline Text-to-Bacot", file: "/Te_eR_Text_to_BacotTeeRtoSpeech_2026-01-13-09-16-24.wav", type: "Branding" }, 
+  { title: "Intro & Pengumuman (Formal)", file: "/Te_eR_Halo_saya_resmi_mengumumk_2026-01-13-23-37-06.wav", type: "News" },
+  { title: "Nada Lucu & Witty", file: "/Te_eR_Nada_Lucu_dan_Witty_Inton_2026-01-13-22-06-47.wav", type: "Fun" },
+  { title: "Demo Suara Natural", file: "/Te_eR_Halo_ini_adalah_contoh_te_2026-01-13-21-54-44.wav", type: "Casual" },
+  { title: "Doa & Murotal (Spiritual)", file: "/Te_eR_Doa_Meminta_Ampunan_Allah_2026-01-13-10-21-38.wav", type: "Murotal" },
+  { title: "Tagline Text-to-Bacot", file: "/Te_eR_Text_to_BacotTeeRtoSpeech_2026-01-13-09-16-24.wav", type: "Branding" },
+];
+
+const FALLBACK_SCRIPTS = [
+  "Tes satu dua tiga, dicoba! Mic-nya aman kan gais? Suara saya terdengar jelas?",
+  "Hari ini mendung, tapi hatiku tetap cerah secerah layar HP kamu saat melihat notifikasi gajian.",
+  "Makan nasi pakai kerupuk, jangan lupa bayar hutang yang numpuk. Hidup indah tanpa cicilan!",
+  "Di balik tawa yang renyah, terdapat tagihan paylater yang meresahkan jiwa dan raga.",
+  "Selamat pagi dunia tipu-tipu, semoga hari ini kita tetap waras walau deadline menumpuk."
 ];
 
 const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'female', promptContext: string }> = {
+  // Official
   "Kore": { baseVoice: "Kore", gender: "female", promptContext: "Normal" },
   "Fenrir": { baseVoice: "Fenrir", gender: "male", promptContext: "Normal" },
+  
+  // Daerah
   "Jawa_Generic_ID_01": { baseVoice: "Charon", gender: "male", promptContext: "Pria Jawa medok, santai tapi sopan" },
   "Betawi_Generic_ID_01": { baseVoice: "Orus", gender: "male", promptContext: "Pria Betawi, ceplas-ceplos, nada tinggi, 'gue-elo'" },
   "Batak_Generic_ID_01": { baseVoice: "Orus", gender: "male", promptContext: "Pria Batak, suara lantang, tegas, berwibawa, logat kuat" }, 
@@ -150,6 +231,8 @@ const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'femal
   "Jawa_Ngapak_ID_01": { baseVoice: "Kore", gender: "female", promptContext: "Mbak Jawa Ngapak (Banyumas/Tegal), logat ngapak medok, lucu, 'inyong'" },
   "Minang_Female_ID_01": { baseVoice: "Aoede", gender: "female", promptContext: "Uni Minang, logat Padang kental, tegas, cepat, 'awak'" },
   "Melayu_Generic_ID_01": { baseVoice: "Aoede", gender: "female", promptContext: "Mak Cik Melayu (Riau/Malaysia), logat mendayu-dayu, sangat sopan" },
+  
+  // Tokoh
   "Pres_Generic_ID": { baseVoice: "Charon", gender: "male", promptContext: "Pidato Presiden, lambat, sangat berwibawa, formal, jeda panjang" },
   "Komedi_Generic_ID": { baseVoice: "Puck", gender: "male", promptContext: "Komedian stand-up, nada bercanda, tertawa kecil, cepat" },
   "News_Generic_ID": { baseVoice: "Orus", gender: "male", promptContext: "Pembaca berita TV, formal, artikulasi sangat jelas, datar" },
@@ -160,9 +243,19 @@ const VOICE_MAPPING: Record<string, { baseVoice: string, gender: 'male' | 'femal
   "Sport_Generic_ID": { baseVoice: "Orus", gender: "male", promptContext: "Komentator bola jebret, berteriak, histeris, sangat cepat" },
   "Fairy_Generic_ID": { baseVoice: "Aoede", gender: "female", promptContext: "Ibu Peri dongeng, keibuan, sangat lembut, magis" },
   "Villain_Generic_ID": { baseVoice: "Charon", gender: "male", promptContext: "Penjahat Anime, suara serak, mengerikan, jahat, tertawa licik" }, 
+  
+  // QORI (Updated Names)
+  "Bayyati_Qori1": { baseVoice: "Charon", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, warm, soft, calm, like Qori Muhammad Siddiq Al-Minshawi" },
+  "Bayyati_Qori2": { baseVoice: "Fenrir", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, clear, steady, like Qori Mahmoud Khalil Al-Hussary" },
+  "Bayyati_Qori3": { baseVoice: "Zephyr", gender: "male", promptContext: "Reciting Quran style, Bayyati tone, melodic, like Qori Muammar Z.A." },
+  "Hijaz_Qori1": { baseVoice: "Fenrir", gender: "male", promptContext: "Reciting Quran style, Hijaz tone, sharp, emotional, high pitch, like Qori Abdul Basit" },
+  "Hijaz_Qori2": { baseVoice: "Puck", gender: "male", promptContext: "Reciting Quran style, Hijaz tone, dynamic, faster, like Qori Ahmed Al-Ajmi" },
+  "Hijaz_Qori3": { baseVoice: "Zephyr", gender: "male", promptContext: "Reciting Quran style, Hijaz tone, soft but emotional, like Qori Islam Sobhi" },
+  "Nahawand_Qori1": { baseVoice: "Charon", gender: "male", promptContext: "Reciting Quran style, Nahawand tone, sad, dramatic, deep, like Qori Mishary Rashid Alafasy" },
+  "Nahawand_Qori2": { baseVoice: "Fenrir", gender: "male", promptContext: "Reciting Quran style, Nahawand tone, dramatic, engaging, like Qori Omar Hisham Al Arabi" },
+  "Nahawand_Qori3": { baseVoice: "Zephyr", gender: "male", promptContext: "Reciting Quran style, Nahawand tone, high variation, beautiful sadness, like Qori Salman Amrillah" },
 };
 
-// ... (Helper function createAccentMapping and usage remains the same)
 const createAccentMapping = (idPrefix: string, baseVoice: string, gender: string, basePrompt: string) => {
   const accents = [
     { code: "USA", label: "USA" }, { code: "UK", label: "British" }, { code: "Aussie", label: "Australian" },
@@ -193,6 +286,17 @@ const VOICE_DATABASE_CATEGORIES = {
     { name: "Puck (Pria, Ringan)", id: "Puck" },
     { name: "Zephyr (Pria, Tenang)", id: "Zephyr" },
     { name: "Charon (Pria, Deep)", id: "Charon" },
+  ],
+  "Murotal PRO (Qori)": [
+    { name: "Bayati Qori-1 (Hangat/Lembut)", id: "Bayyati_Qori1" },
+    { name: "Bayati Qori-2 (Tegas/Tenang)", id: "Bayyati_Qori2" },
+    { name: "Bayati Qori-3 (Melodious)", id: "Bayyati_Qori3" },
+    { name: "Hijaz Qori-1 (Tajam/Emosional)", id: "Hijaz_Qori1" },
+    { name: "Hijaz Qori-2 (Cepat/Dinamis)", id: "Hijaz_Qori2" },
+    { name: "Hijaz Qori-3 (Halus/Sedih)", id: "Hijaz_Qori3" },
+    { name: "Nahawand Qori-1 (Sedih/Dalam)", id: "Nahawand_Qori1" },
+    { name: "Nahawand Qori-2 (Dramatis)", id: "Nahawand_Qori2" },
+    { name: "Nahawand Qori-3 (Indah)", id: "Nahawand_Qori3" },
   ],
   "Logat Daerah (Pria)": [
     { name: "Mas Joko (Logat Jawa Medok)", id: "Jawa_Generic_ID_01" },
@@ -255,49 +359,53 @@ const VOICE_DATABASE_CATEGORIES = {
   ]
 };
 
-const STYLE_PRESETS = [
-  "Netral", "Gembira", "Sedih", "Marah/Emosi", "Terkejut", 
-  "Bingung", "Galau", "Berteriak", "Berbisik", "Tertawa", 
-  "Humoris", "Menghela Nafas", "Serius", "Berita/News", "Dongeng",
-  "Murotal", "Sopran", "Bass", "Podcaster", "Reporter", "Tenor", "Seriosa"
-];
+const defaultApiKey = ""; // Used as fallback if user doesn't provide key
 
-const TARGET_LANGUAGES = [
-  { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
-  { code: 'en', name: 'Inggris', flag: '🇬🇧' },
-  { code: 'ar', name: 'Arab', flag: '🇸🇦' },
-  { code: 'ru', name: 'Rusia', flag: '🇷🇺' },
-  { code: 'de', name: 'Jerman', flag: '🇩🇪' },
-  { code: 'fr', name: 'Perancis', flag: '🇫🇷' },
-  { code: 'es', name: 'Spanyol', flag: '🇪🇸' },
-  { code: 'pt', name: 'Portugis', flag: '🇵🇹' },
-  { code: 'it', name: 'Italia', flag: '🇮🇹' },
-  { code: 'tr', name: 'Turki', flag: '🇹🇷' },
-  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
-  { code: 'ja', name: 'Jepang', flag: '🇯🇵' },
-  { code: 'ko', name: 'Korea', flag: '🇰🇷' },
-  { code: 'hi', name: 'India', flag: '🇮🇳' },
-  { code: 'th', name: 'Thailand', flag: '🇹🇭' },
-  { code: 'vi', name: 'Vietnam', flag: '🇻🇳' },
-  { code: 'tl', name: 'Tagalog', flag: '🇵🇭' },
-  { code: 'af', name: 'Afrika', flag: '🇿🇦' },
-];
+// --- 2. UTILITY FUNCTIONS ---
 
-const FALLBACK_SCRIPTS = [
-  "Tes satu dua tiga, dicoba! Mic-nya aman kan gais? Suara saya terdengar jelas?",
-  "Hari ini mendung, tapi hatiku tetap cerah secerah layar HP kamu saat melihat notifikasi gajian.",
-  "Makan nasi pakai kerupuk, jangan lupa bayar hutang yang numpuk. Hidup indah tanpa cicilan!",
-  "Di balik tawa yang renyah, terdapat tagihan paylater yang meresahkan jiwa dan raga.",
-  "Selamat pagi dunia tipu-tipu, semoga hari ini kita tetap waras walau deadline menumpuk."
-];
+const fetchWithRetry = async (url: string, options: RequestInit, retries = 5, initialDelay = 1000): Promise<Response> => {
+  let delay = initialDelay;
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return response;
+      if (response.status === 401 || response.status === 403) throw new Error("API Key Invalid");
+      if (response.status === 400) {
+         const err = await response.json().catch(() => ({}));
+         console.error("Bad Request:", err);
+         throw new Error("Parameter Salah (Voice/Prompt) atau Request Ditolak.");
+      }
+      throw new Error(`HTTP Error ${response.status}`);
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await new Promise(resolve => setTimeout(resolve, delay));
+      delay *= 2; 
+    }
+  }
+  throw new Error("Max retries reached");
+};
 
-// --- LANDING PAGE COMPONENT ---
-const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void, isDarkMode: boolean, toggleTheme: () => void }) => {
+// --- 3. COMPONENTS ---
+
+// Tipe Data History
+interface HistoryItem {
+  id: string;
+  url: string;
+  text: string;
+  voice: string;
+  date: string;
+  duration?: number;
+}
+
+const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }: any) => {
   const [logoSwitch, setLogoSwitch] = useState(false);
   const [typedText, setTypedText] = useState("");
-  const fullText = "BERNYAWA";
+  const fullText = language === 'en' ? "OF LIFE" : "BERNYAWA";
   const [activeAudioIndex, setActiveAudioIndex] = useState<number | null>(null);
   const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
+
+  // Default to Indonesian if translation missing (safety fallback)
+  const t = TRANSLATIONS[language as keyof typeof TRANSLATIONS] || TRANSLATIONS.id;
 
   useEffect(() => {
     const interval = setInterval(() => setLogoSwitch(prev => !prev), 3000);
@@ -305,6 +413,7 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
   }, []);
 
   useEffect(() => {
+    setTypedText(""); // Reset text when language changes
     let index = 0;
     const typeInterval = setInterval(() => {
       if (index <= fullText.length) {
@@ -315,10 +424,9 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
       }
     }, 200);
     return () => clearInterval(typeInterval);
-  }, []);
+  }, [fullText]); // Re-run effect when fullText changes
 
   const handlePlaySample = (index: number) => {
-    // Stop semua audio lain sebelum memutar yang baru
     audioRefs.current.forEach((audio, i) => {
       if (i !== index && audio) {
         audio.pause();
@@ -329,7 +437,6 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
     const currentAudio = audioRefs.current[index];
     if (currentAudio) {
       if (currentAudio.paused) {
-        // Safe play with promise handling
         const playPromise = currentAudio.play();
         if (playPromise !== undefined) {
           playPromise
@@ -337,7 +444,7 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
               setActiveAudioIndex(index);
             })
             .catch(error => {
-              console.log("Audio not ready or blocked by browser policy:", error);
+              console.log("Audio play failed:", error);
               setActiveAudioIndex(null);
             });
         }
@@ -355,42 +462,48 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
 
   return (
     <div className={`min-h-screen font-sans transition-colors duration-500 ${bgClass}`}>
-      {/* Navbar */}
       <nav className={`fixed top-0 w-full z-50 backdrop-blur-md border-b ${navClass}`}>
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-4">
               <div className={`relative h-10 w-10 md:h-12 md:w-12 rounded-xl flex items-center justify-center shadow-lg ${logoBg} shadow-cyan-500/20`}>
-                <Volume2 className={`absolute w-6 h-6 md:w-7 md:h-7 text-white transition-all duration-700 ${logoSwitch ? 'opacity-0 scale-50 rotate-180' : 'opacity-100 scale-100'}`} />
-                <MessageCircle className={`absolute w-6 h-6 md:w-7 md:h-7 text-white transition-all duration-700 ${logoSwitch ? 'opacity-100 scale-100' : 'opacity-0 scale-50 -rotate-180'}`} />
+                <Volume2 className={`absolute w-7 h-7 text-white transition-all duration-700 ease-in-out transform ${logoSwitch ? 'opacity-0 scale-50 rotate-180' : 'opacity-100 scale-100 rotate-0'}`} />
+                <MessageCircle className={`absolute w-7 h-7 text-white transition-all duration-700 ease-in-out transform ${logoSwitch ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-180'}`} />
               </div>
               <div>
                 <h1 className="text-lg md:text-xl font-bold tracking-tight">
                   Te_eR™ <span className="text-cyan-400 animate-pulse">to Speech</span>
                 </h1>
                 <p className={`text-[10px] md:text-xs font-mono tracking-widest ${isDarkMode ? 'text-cyan-200/70' : 'text-blue-600/70'}`}>
-                  Text to Bacot PRO
+                  {t.tagline}
                 </p>
               </div>
             </div>
           </div>
           
-          <button 
-            onClick={toggleTheme}
-            className={`p-2 rounded-xl border transition-all ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-slate-200 hover:bg-slate-100'}`}
-          >
-            {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setLanguage(language === 'id' ? 'en' : 'id')}
+              className={`px-3 py-2 rounded-xl border font-bold text-xs transition-all flex items-center gap-1 ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-slate-200 hover:bg-slate-100'}`}
+            >
+              <Globe className="w-3 h-3" /> {language.toUpperCase()}
+            </button>
+            <button 
+              onClick={toggleTheme}
+              className={`p-2 rounded-xl border transition-all ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-slate-200 hover:bg-slate-100'}`}
+            >
+              {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
       <header className="pt-32 pb-20 px-6 text-center relative overflow-hidden">
         <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[120px] -z-10 ${isDarkMode ? 'bg-blue-600/20' : 'bg-blue-200/40'}`}></div>
         
         <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-tight">
-          Ubah Teks Jadi <br/>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Suara </span>
+          {t.heroTitle1} <br/>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">{t.heroTitle2} </span>
           <span className="relative inline-block">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]">
               {typedText}
@@ -400,34 +513,34 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
         </h2>
         
         <p className={`text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed ${isDarkMode ? 'text-neutral-400' : 'text-slate-600'}`}>
-          Platform Text-to-Speech tercanggih dengan dukungan logat daerah Indonesia, 
-          kloning suara, dan emosi yang nyata. <span className="font-bold text-cyan-500">GRATIS !*</span>
+          {t.heroDesc} <span className="font-bold text-cyan-500">{t.freeBadge}</span>
         </p>
 
         <button 
             onClick={onStart}
             className="mb-8 px-8 py-3 bg-white text-black rounded-full font-bold text-base hover:bg-cyan-50 transition-colors animate-[pulse_2s_infinite] border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]"
           >
-            Mulai Sekarang
+            {t.startBtn}
         </button>
 
         <div className="flex flex-wrap justify-center gap-4">
           <div className={`flex items-center gap-2 px-4 py-2 rounded-full border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200'}`}>
-            <Zap className="w-4 h-4 text-yellow-400" /> Powered by Gemini
+            <Zap className="w-4 h-4 text-yellow-400" /> {t.poweredBy} Gemini
           </div>
         </div>
       </header>
 
-      {/* Features Grid */}
       <section className={`py-20 border-y ${isDarkMode ? 'bg-neutral-900/50 border-white/5' : 'bg-slate-100/50 border-slate-200'}`}>
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
-            { icon: <Globe className="w-8 h-8 text-cyan-400" />, title: "30+ Model Suara", desc: "Termasuk aksen negara & logat daerah (Jawa, Sunda, dll)." },
-            { icon: <Smile className="w-8 h-8 text-pink-400" />, title: "Kaya Emosi", desc: "Atur intonasi: Gembira, Sedih, Marah, Murotal." },
-            { icon: <Mic2 className="w-8 h-8 text-green-400" />, title: "Voice Cloning", desc: "Rekam & simpan suara Anda sendiri untuk dijadikan model." },
-            { icon: <Infinity className="w-8 h-8 text-purple-400" />, title: "Tanpa Batas", desc: "Generate TTS sepuasnya & download langsung." },
-            { icon: <Sun className="w-8 h-8 text-yellow-400" />, title: "Tampilan Adaptif", desc: "Mode Gelap & Terang yang nyaman di mata." },
-            { icon: <Languages className="w-8 h-8 text-blue-400" />, title: "Auto Translate", desc: "Terjemahkan skrip ke berbagai bahasa instan." },
+            { icon: <Globe className="w-8 h-8 text-cyan-400" />, title: t.feature1, desc: t.feature1Desc },
+            { icon: <Smile className="w-8 h-8 text-pink-400" />, title: t.feature2, desc: t.feature2Desc },
+            { icon: <Mic2 className="w-8 h-8 text-green-400" />, title: t.feature3, desc: t.feature3Desc },
+            { icon: <Infinity className="w-8 h-8 text-purple-400" />, title: t.feature4, desc: t.feature4Desc },
+            { icon: <Sun className="w-8 h-8 text-yellow-400" />, title: t.feature5, desc: t.feature5Desc },
+            { icon: <Languages className="w-8 h-8 text-blue-400" />, title: t.feature6, desc: t.feature6Desc },
+            { icon: <BookOpen className="w-8 h-8 text-emerald-400" />, title: t.feature7, desc: t.feature7Desc },
+            { icon: <Map className="w-8 h-8 text-orange-400" />, title: t.feature8, desc: t.feature8Desc },
           ].map((feature, i) => (
             <div key={i} className={`p-6 rounded-2xl border transition-all hover:-translate-y-1 ${isDarkMode ? 'bg-neutral-950 border-white/5 hover:border-cyan-500/30' : 'bg-white border-slate-200 hover:border-blue-400 shadow-sm'}`}>
               <div className="mb-4">{feature.icon}</div>
@@ -438,11 +551,9 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
         </div>
       </section>
 
-      {/* Audio Showcase */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-3xl font-bold text-center mb-10">Dengar Hasil Suara <span className="text-cyan-400">Te_eR™</span></h3>
-          
+          <h3 className="text-3xl font-bold text-center mb-10">{t.showcaseTitle} <span className="text-cyan-400">Te_eR™</span></h3>
           <div className="space-y-4">
             {AUDIO_SAMPLES.map((audio, idx) => (
               <div key={idx} className={`flex items-center gap-4 p-4 rounded-xl border transition-colors ${cardClass}`}>
@@ -456,19 +567,16 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
                   <h4 className="font-bold text-sm truncate">{audio.title}</h4>
                   <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? 'bg-white/10 text-neutral-400' : 'bg-slate-100 text-slate-500'}`}>{audio.type}</span>
                 </div>
-                {/* Native Audio Element (Hidden functionality via custom button, or visible if needed) */}
                 <audio 
                   ref={el => audioRefs.current[idx] = el}
                   src={audio.file} 
                   className={`h-8 w-32 md:w-64 ${isDarkMode ? 'accent-cyan-500' : 'accent-blue-500'}`}
-                  controls // Keep controls for fallback interaction
+                  controls 
                   onPlay={() => setActiveAudioIndex(idx)}
                   onPause={() => setActiveAudioIndex(null)}
                   onError={(e) => {
-                    // Suppress circular error in console by hiding element on fail
                     const target = e.target as HTMLAudioElement;
                     target.style.display = 'none';
-                    // Show simple warning
                     console.warn(`File audio '${audio.file}' tidak ditemukan di folder /public.`);
                   }}
                 />
@@ -478,27 +586,29 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
         </div>
       </section>
 
-      {/* Bottom CTA */}
       <section className="py-20 text-center relative">
         <div className={`absolute inset-0 bg-gradient-to-t -z-10 ${isDarkMode ? 'from-blue-900/20' : 'from-blue-100'} to-transparent`}></div>
-        <h3 className="text-2xl md:text-4xl font-bold mb-8">Siap Membuat Konten Bersuara?</h3>
-        
+        <h3 className="text-2xl md:text-4xl font-bold mb-8">{t.ctaTitle}</h3>
         <button 
           onClick={onStart}
           className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-blue-600 font-lg rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 hover:bg-blue-500 animate-[pulse_1.5s_infinite]"
         >
-          <span className="mr-2 text-xl">Kuy Mulai</span>
-          <span className="text-xl">BACOT</span>
+          <span className="mr-2 text-xl">{t.ctaBtn1}</span>
+          <span className="text-xl">{t.ctaBtn2}</span>
           <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           <div className="absolute inset-0 rounded-full ring-4 ring-white/20 group-hover:ring-white/40 animate-ping opacity-20"></div>
         </button>
       </section>
 
-      {/* Footer Landing Page (Copyright Only) */}
       <footer className={`py-10 border-t text-center ${isDarkMode ? 'border-white/5 bg-black' : 'border-slate-200 bg-slate-50'}`}>
-        <p className="text-xs font-mono text-cyan-500/50 animate-pulse tracking-[0.2em]">
-          Te_eR™ Inovative @2026
-        </p>
+        <div className="flex flex-col items-center gap-4">
+          <a href="mailto:hijrtime+ttspro@gmail.com" className={`flex items-center gap-2 px-5 py-2 rounded-full border text-sm font-bold transition-all hover:scale-105 ${isDarkMode ? 'border-white/10 hover:bg-white/10' : 'border-slate-300 hover:bg-slate-100'}`}>
+            <Mail className="w-4 h-4" /> {t.footerContact}
+          </a>
+          <p className="text-xs font-mono text-cyan-500/50 animate-pulse tracking-[0.2em]">
+            Te_eR™ Inovative @2026
+          </p>
+        </div>
       </footer>
     </div>
   );
@@ -506,19 +616,17 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme }: { onStart: () => void
 
 // --- MAIN APP COMPONENT ---
 
-const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme: () => void }) => {
+const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
   const [activeTab, setActiveTab] = useState<'gemini' | 'elevenlabs'>('gemini');
-  const [text, setText] = useState<string>("Halo, ini adalah contoh teks untuk dikonversi menjadi suara.");
+  const [text, setText] = useState<string>(""); // Started empty to show placeholder
   const [isLoading, setIsLoading] = useState(false);
   const [showSpeakerIcon, setShowSpeakerIcon] = useState(false);
   
-  // Audio & History
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [currentAudio, setCurrentAudio] = useState<HistoryItem | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   
-  // Recorder State
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
@@ -528,7 +636,6 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
   const [customCloneName, setCustomCloneName] = useState("");
   const [customClones, setCustomClones] = useState<{name: string, id: string}[]>([]);
 
-  // Settings & Prompt
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'error' | 'success', text: string } | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -544,6 +651,7 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
   const [elevenModelId, setElevenModelId] = useState("");
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const t = TRANSLATIONS[language as keyof typeof TRANSLATIONS] || TRANSLATIONS.id;
 
   // Theme Colors
   const colors = {
@@ -586,7 +694,7 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
     localStorage.setItem('userGeminiApiKey', userGeminiApiKey);
     localStorage.setItem('elevenLabsKey', elevenLabsApiKey);
     setIsSettingsOpen(false);
-    setStatusMsg({ type: 'success', text: 'Pengaturan tersimpan!' });
+    setStatusMsg({ type: 'success', text: t.saveSettings + ' OK!' });
     setTimeout(() => setStatusMsg(null), 3000);
   };
 
@@ -614,7 +722,7 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
       
       if (translatedText) {
         setText(translatedText.trim());
-        setStatusMsg({ type: 'success', text: 'Teks berhasil diterjemahkan!' });
+        setStatusMsg({ type: 'success', text: 'Translate OK!' });
         setIsSettingsOpen(false);
       } else {
         throw new Error("Gagal translate.");
@@ -803,7 +911,7 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
     setCustomClones(updated);
     localStorage.setItem('gemini_clones', JSON.stringify(updated));
     setRecordedUrl(null); setRecordedBlob(null); setCustomCloneName("");
-    setStatusMsg({ type: 'success', text: 'Clone Saved!' });
+    setStatusMsg({ type: 'success', text: t.recSave + ' OK!' });
   };
 
   // --- RENDER MAIN APP ---
@@ -823,7 +931,7 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
                 <span className="relative">Te_eR™<span className={`absolute -inset-1 blur-md opacity-50 animate-pulse ${isDarkMode ? 'bg-blue-500' : 'bg-cyan-400'}`}></span></span>
                 <span className="relative z-10 animate-[pulse_2s_infinite]">to Speech</span>
               </h1>
-              <p className={`text-xs font-mono tracking-wider transition-colors ${colors.accent}`}>TEXT TO BACOT PRO</p>
+              <p className={`text-xs font-mono tracking-wider transition-colors ${colors.accent}`}>{t.tagline}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -852,16 +960,16 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
             <div className={`rounded-3xl border shadow-xl p-6 space-y-6 transition-colors ${colors.card}`}>
               <div className={`flex items-center gap-2 border-b pb-4 ${isDarkMode ? 'border-white/5' : 'border-blue-100'}`}>
                 <Settings className={`w-4 h-4 ${colors.textMuted}`} />
-                <span className={`text-xs font-bold tracking-widest uppercase ${colors.textMuted}`}>Konfigurasi Suara</span>
+                <span className={`text-xs font-bold tracking-widest uppercase ${colors.textMuted}`}>{t.configTitle}</span>
               </div>
 
               {activeTab === 'gemini' ? (
                 <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-300">
                   <div className="space-y-2">
-                    <label className={`text-sm block ${colors.textMuted}`}>Model Suara PRO (50+ Archetypes)</label>
+                    <label className={`text-sm block ${colors.textMuted}`}>{t.voiceModelLabel}</label>
                     <div className="relative">
                       <select value={geminiVoiceId} onChange={(e) => setGeminiVoiceId(e.target.value)} className={`w-full border rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-opacity-100 transition-colors cursor-pointer text-sm ${isDarkMode ? 'bg-neutral-950 border-white/10 text-white focus:border-lime-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-500'}`}>
-                         {customClones.length > 0 && <optgroup label="✨ Rekaman Tersimpan (Lokal)" className={isDarkMode ? "bg-neutral-900" : "bg-white"}>{customClones.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</optgroup>}
+                         {customClones.length > 0 && <optgroup label={t.recSavedTitle} className={isDarkMode ? "bg-neutral-900" : "bg-white"}>{customClones.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</optgroup>}
                          {Object.entries(VOICE_DATABASE_CATEGORIES).map(([category, voices]) => (
                           <optgroup key={category} label={category} className={isDarkMode ? "bg-neutral-900 text-lime-300" : "bg-white text-blue-600 font-bold"}>
                             {voices.map(v => <option key={v.id} value={v.id} className={isDarkMode ? "text-white" : "text-slate-800 font-normal"}>{v.name}</option>)}
@@ -872,26 +980,32 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className={`text-sm block ${colors.textMuted}`}>Instruksi Gaya/Emosi</label>
+                    <label className={`text-sm block ${colors.textMuted}`}>{t.styleLabel}</label>
                     <div className="relative">
                       <MessageSquare className={`absolute left-4 top-3.5 w-4 h-4 ${colors.textMuted}`} />
-                      <input type="text" value={styleInstruction} onChange={(e) => setStyleInstruction(e.target.value)} placeholder="Contoh: Sedih, Marah..." className={`w-full border rounded-xl pl-10 pr-4 py-3 focus:outline-none transition-colors ${isDarkMode ? 'bg-neutral-950 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} />
+                      <input type="text" value={styleInstruction} onChange={(e) => setStyleInstruction(e.target.value)} placeholder={t.stylePlaceholder} className={`w-full border rounded-xl pl-10 pr-4 py-3 focus:outline-none transition-colors ${isDarkMode ? 'bg-neutral-950 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} />
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {STYLE_PRESETS.map(style => (
-                      <button key={style} onClick={() => setStyleInstruction(style)} className={`px-3 py-1.5 rounded-lg text-xs transition-colors border ${styleInstruction === style ? `${isDarkMode ? 'bg-lime-500/20 text-lime-300' : 'bg-blue-100 text-blue-600'}` : `${isDarkMode ? 'bg-neutral-800 text-neutral-300' : 'bg-white text-slate-600'}`}`}>{style}</button>
+                    {STYLE_PRESETS_DATA.map(style => (
+                      <button 
+                        key={style.id} 
+                        onClick={() => setStyleInstruction(style.id)} 
+                        className={`px-3 py-1.5 rounded-lg text-xs transition-colors border ${styleInstruction === style.id ? `${isDarkMode ? 'bg-lime-500/20 text-lime-300' : 'bg-blue-100 text-blue-600'}` : `${isDarkMode ? 'bg-neutral-800 text-neutral-300' : 'bg-white text-slate-600'}`}`}
+                      >
+                        {language === 'en' ? style.label_en : style.label_id}
+                      </button>
                     ))}
                   </div>
                   {/* RECORDER */}
                   <div className={`pt-4 border-t space-y-3 ${isDarkMode ? 'border-white/5' : 'border-blue-100'}`}>
-                    <label className={`text-sm font-bold block flex items-center gap-2 ${colors.accent}`}><Disc className="w-4 h-4 animate-spin-slow" /> Rekam Suara (Cloning)</label>
+                    <label className={`text-sm font-bold block flex items-center gap-2 ${colors.accent}`}><Disc className="w-4 h-4 animate-spin-slow" /> {t.recTitle}</label>
                     <div className={`rounded-xl p-3 border space-y-3 ${isDarkMode ? 'bg-black/30 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
-                       <div className="flex justify-between items-center"><span className={`text-xs font-mono ${colors.textMuted}`}>{isRecording ? `Merekam... ${recordingTime}s` : 'Siap Merekam'}</span>{isRecording && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />}</div>
+                       <div className="flex justify-between items-center"><span className={`text-xs font-mono ${colors.textMuted}`}>{isRecording ? `REC... ${recordingTime}s` : 'Ready'}</span>{isRecording && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />}</div>
                        <div className="flex gap-2">
-                          <button onClick={isRecording ? stopRecording : startRecording} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-xs font-bold transition-all ${isRecording ? 'bg-red-500/20 text-red-400 border-red-500/50' : `${isDarkMode ? 'bg-neutral-800 text-white' : 'bg-white text-slate-700 shadow-sm'}`}`}>{isRecording ? <Square className="w-3 h-3 fill-current" /> : <Mic className="w-3 h-3" />}{isRecording ? 'Stop' : 'Mulai Rekam'}</button>
+                          <button onClick={isRecording ? stopRecording : startRecording} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-xs font-bold transition-all ${isRecording ? 'bg-red-500/20 text-red-400 border-red-500/50' : `${isDarkMode ? 'bg-neutral-800 text-white' : 'bg-white text-slate-700 shadow-sm'}`}`}>{isRecording ? <Square className="w-3 h-3 fill-current" /> : <Mic className="w-3 h-3" />}{isRecording ? t.recStop : t.recStart}</button>
                        </div>
-                       {recordedUrl && <div className="space-y-2 animate-in slide-in-from-top-2"><audio src={recordedUrl} controls className="w-full h-6 accent-blue-500" /><div className="flex gap-2"><input value={customCloneName} onChange={(e) => setCustomCloneName(e.target.value)} placeholder="Nama Voice Clone..." className={`flex-1 border rounded px-2 text-xs focus:outline-none ${isDarkMode ? 'bg-neutral-900 text-white' : 'bg-white text-slate-900'}`} /><button onClick={saveClone} className={`px-3 rounded text-xs font-bold ${isDarkMode ? 'bg-lime-500 text-black' : 'bg-blue-600 text-white'}`}>Simpan</button></div></div>}
+                       {recordedUrl && <div className="space-y-2 animate-in slide-in-from-top-2"><audio src={recordedUrl} controls className="w-full h-6 accent-blue-500" /><div className="flex gap-2"><input value={customCloneName} onChange={(e) => setCustomCloneName(e.target.value)} placeholder="Nama..." className={`flex-1 border rounded px-2 text-xs focus:outline-none ${isDarkMode ? 'bg-neutral-900 text-white' : 'bg-white text-slate-900'}`} /><button onClick={saveClone} className={`px-3 rounded text-xs font-bold ${isDarkMode ? 'bg-lime-500 text-black' : 'bg-blue-600 text-white'}`}>{t.recSave}</button></div></div>}
                     </div>
                   </div>
                 </div>
@@ -912,29 +1026,118 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
           <div className="lg:col-span-8 space-y-6">
             <div className={`rounded-3xl border overflow-hidden flex flex-col h-[400px] ${colors.card}`}>
               <div className={`border-b p-4 flex items-center justify-between ${isDarkMode ? 'bg-neutral-950/50 border-white/5' : 'bg-slate-50/50 border-blue-100'}`}>
-                <div className="flex items-center gap-2"><span className={`text-xs font-bold tracking-widest ml-2 ${colors.textMuted}`}>SCRIPT EDITOR</span></div>
-                <button onClick={handleAutoWrite} disabled={isLoading} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all text-xs font-medium text-red-400">{isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />} Tulis Otomatis</button>
+                <div className="flex items-center gap-2"><span className={`text-xs font-bold tracking-widest ml-2 ${colors.textMuted}`}>{t.editorTitle}</span></div>
+                <button onClick={handleAutoWrite} disabled={isLoading} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all text-xs font-medium text-red-400">{isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />} {t.autoWrite}</button>
               </div>
-              <div className="flex-1 p-6 relative"><textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Ketik teks yang ingin diubah menjadi suara di sini..." className={`w-full h-full bg-transparent resize-none focus:outline-none text-lg leading-relaxed font-medium ${isDarkMode ? 'text-neutral-200 placeholder-neutral-700' : 'text-slate-700 placeholder-slate-300'}`} /></div>
+              <div className="flex-1 p-6 relative"><textarea value={text} onChange={(e) => setText(e.target.value)} placeholder={t.editorPlaceholder} className={`w-full h-full bg-transparent resize-none focus:outline-none text-lg leading-relaxed font-medium ${isDarkMode ? 'text-neutral-200 placeholder-neutral-700' : 'text-slate-700 placeholder-slate-300'}`} /></div>
               <div className={`p-6 border-t space-y-4 ${isDarkMode ? 'bg-neutral-950/30 border-white/5' : 'bg-slate-50/50 border-blue-100'}`}>
                 {statusMsg && <div className={`flex items-center gap-2 text-sm animate-in slide-in-from-bottom-2 fade-in ${statusMsg.type === 'error' ? 'text-red-400' : 'text-green-500'}`}>{statusMsg.type === 'error' ? <AlertCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}{statusMsg.text}</div>}
-                <button onClick={generateAudio} disabled={isLoading} className={`w-full h-14 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed ${colors.buttonPrimary}`}>{isLoading ? <><Loader2 className="w-6 h-6 animate-spin" /><span>Memproses Suara...</span></> : <><PlayCircle className="w-6 h-6" /><span>Buat Suara Sekarang</span></>}</button>
+                <button onClick={generateAudio} disabled={isLoading} className={`w-full h-14 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed ${colors.buttonPrimary}`}>{isLoading ? <><Loader2 className="w-6 h-6 animate-spin" /><span>{t.processing}</span></> : <><PlayCircle className="w-6 h-6" /><span>{t.generateBtn}</span></>}</button>
               </div>
             </div>
 
             {/* PLAYER & LIBRARY */}
-            {currentAudio && (
-                <div className={`sticky top-24 z-30 backdrop-blur-md rounded-2xl border p-4 shadow-2xl animate-in slide-in-from-top-4 ${isDarkMode ? 'bg-neutral-800/90 border-lime-500/30' : 'bg-white/90 border-blue-200'}`}>
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border shrink-0 ${isDarkMode ? 'bg-lime-500/20 border-lime-500/30' : 'bg-blue-100 border-blue-200'}`}>{isPlaying ? <div className="flex gap-0.5 items-end h-5"><div className={`w-1 h-3 animate-[pulse_0.5s_ease-in-out_infinite] ${isDarkMode ? 'bg-lime-400' : 'bg-blue-600'}`}></div></div> : <Music className={`w-6 h-6 ${isDarkMode ? 'text-lime-400' : 'text-blue-600'}`} />}</div>
-                    <div className="flex-1 min-w-0"><div className="flex justify-between items-center mb-1"><h4 className={`font-medium truncate text-sm ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{currentAudio.text}</h4><span className={`text-[10px] border px-1.5 rounded ${isDarkMode ? 'text-lime-400 border-lime-500/20' : 'text-blue-600 border-blue-200 bg-blue-50'}`}>{currentAudio.voice}</span></div><audio ref={audioRef} src={currentAudio.url} onEnded={() => setIsPlaying(false)} onPause={() => setIsPlaying(false)} onPlay={() => setIsPlaying(true)} controls className={`w-full h-8 ${isDarkMode ? 'accent-lime-500' : 'accent-blue-600'}`} style={{ filter: isDarkMode ? 'hue-rotate(280deg) invert(10%)' : 'none' }} /></div>
-                  </div>
-                  <div className="flex items-center justify-between mt-3 pl-16">
-                     <div className="flex items-center gap-2"><Gauge className={`w-3 h-3 ${colors.textMuted}`} /><select value={playbackSpeed} onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))} className={`border text-[10px] rounded px-1 py-0.5 focus:outline-none ${isDarkMode ? 'bg-neutral-900 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-700'}`}><option value="0.5">0.5x</option><option value="1.0">1.0x</option><option value="1.5">1.5x</option></select></div>
-                     <a href={currentAudio.url} download={generateFilename(currentAudio.text)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isDarkMode ? 'bg-lime-500 text-neutral-950' : 'bg-blue-600 text-white'}`}><Download className="w-3 h-3" /> Unduh</a>
-                  </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-2">
+                <div className={`flex items-center gap-2 ${colors.textMuted}`}>
+                   <ListMusic className="w-5 h-5" />
+                   <h3 className="font-bold text-sm uppercase tracking-widest">{t.libraryTitle}</h3>
                 </div>
-            )}
+                {history.length > 0 && (
+                   <button 
+                     onClick={() => {
+                        if (window.confirm("Hapus semua riwayat?")) {
+                          setHistory([]);
+                          setCurrentAudio(null);
+                        }
+                     }}
+                     className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+                   >
+                     <Archive className="w-3 h-3" /> {t.deleteHistory}
+                   </button>
+                )}
+              </div>
+
+              {/* LIST HISTORY */}
+              <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                {history.length === 0 ? (
+                  <div className={`text-center py-12 border border-dashed rounded-2xl ${isDarkMode ? 'border-white/10' : 'border-slate-300'}`}>
+                    <History className={`w-8 h-8 mx-auto mb-2 ${colors.textMuted}`} />
+                    <p className={`text-sm ${colors.textMuted}`}>Belum ada riwayat suara.</p>
+                  </div>
+                ) : (
+                  history.map((item) => (
+                    <div 
+                      key={item.id}
+                      className={`group flex items-center justify-between p-3 rounded-xl border transition-all 
+                        ${currentAudio?.id === item.id 
+                          ? `${isDarkMode ? 'bg-neutral-800 border-lime-500/30' : 'bg-blue-50 border-blue-200'}` 
+                          : `${isDarkMode ? 'bg-neutral-900 border-white/5 hover:bg-neutral-800' : 'bg-white border-slate-200 hover:bg-slate-50'}`}`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <button 
+                          onClick={() => {
+                            setCurrentAudio(item);
+                            if (audioRef.current) {
+                                audioRef.current.src = item.url;
+                                audioRef.current.play();
+                                setIsPlaying(true);
+                            }
+                          }}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors
+                            ${currentAudio?.id === item.id 
+                              ? `${isDarkMode ? 'bg-lime-500 text-black' : 'bg-blue-600 text-white'}` 
+                              : `${isDarkMode ? 'bg-neutral-800 border border-white/10 text-white' : 'bg-white border border-slate-200 text-slate-700'}`}`}
+                        >
+                          {(currentAudio?.id === item.id && isPlaying) ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 ml-0.5" />}
+                        </button>
+                        
+                        <div className="min-w-0">
+                          <p className={`text-sm font-medium truncate pr-4 ${currentAudio?.id === item.id ? colors.accent : colors.text}`}>
+                            {item.text}
+                          </p>
+                          <div className={`flex items-center gap-2 text-[10px] ${colors.textMuted}`}>
+                             <span>{item.date}</span>
+                             <span>•</span>
+                             <span>{item.voice}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <a 
+                           href={item.url}
+                           download={generateFilename(item.text)}
+                           className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-white/10 text-neutral-400 hover:text-white' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-700'}`}
+                           title={t.downloadBtn}
+                         >
+                           <Download className="w-4 h-4" />
+                         </a>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* WARNING NOTE */}
+              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                <p className="text-[10px] text-red-500 italic leading-relaxed">
+                  {t.warningNote}
+                </p>
+              </div>
+
+            </div>
+
+            {/* PLAYER (Hidden Audio Element for Logic) */}
+            <audio 
+                ref={audioRef} 
+                onEnded={() => setIsPlaying(false)} 
+                onPause={() => setIsPlaying(false)} 
+                onPlay={() => setIsPlaying(true)} 
+                className="hidden" 
+            />
+
           </div>
         </div>
       </main>
@@ -943,7 +1146,10 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
       <footer className={`mt-8 py-8 border-t flex flex-col items-center justify-center gap-4 ${isDarkMode ? 'border-white/5' : 'border-slate-200'}`}>
         <a href="https://sociabuzz.com/syukrankatsiron/tribe" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 ${isDarkMode ? 'bg-pink-600 text-white shadow-pink-600/20' : 'bg-pink-500 text-white shadow-pink-500/30'}`}><Heart className="w-4 h-4 fill-current" /> Support Us</a>
         <a href="https://ko-fi.com/syukran/tip" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105 active:scale-95"><img src="https://raw.githubusercontent.com/vandratop/Yuk/872daa6f963613ba58fc4ff71f886beed94ff15d/support_me_on_kofi_beige.png" alt="Buy me a Ko-fi" className="h-10 md:h-12" /></a>
-        <p className={`text-sm font-mono animate-pulse tracking-widest ${isDarkMode ? 'text-lime-400/80' : 'text-blue-600/80'}`}>Te_eR™ Inovative @2026</p>
+        <div className="flex flex-col items-center gap-2">
+           <a href="mailto:hijrtime+ttspro@gmail.com" className={`flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-bold transition-all hover:scale-105 ${isDarkMode ? 'border-white/10 hover:bg-white/10' : 'border-slate-300 hover:bg-slate-100'}`}><Mail className="w-3 h-3" /> {t.footerContact}</a>
+           <p className={`text-xs font-mono animate-pulse tracking-widest ${isDarkMode ? 'text-lime-400/80' : 'text-blue-600/80'}`}>Te_eR™ Inovative @2026</p>
+        </div>
       </footer>
 
       {/* MODAL SETTINGS */}
@@ -952,38 +1158,38 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setIsSettingsOpen(false)} />
           <div className={`rounded-2xl border w-full max-w-md relative z-10 p-6 shadow-2xl animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh] ${isDarkMode ? 'bg-neutral-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
             <button onClick={() => setIsSettingsOpen(false)} className="absolute right-4 top-4 hover:opacity-70 transition-opacity"><X className="w-5 h-5" /></button>
-            <div className="flex items-center gap-3 mb-6"><div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-50'}`}><Settings className={`w-6 h-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} /></div><h2 className="text-xl font-bold">Pengaturan</h2></div>
+            <div className="flex items-center gap-3 mb-6"><div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-50'}`}><Settings className={`w-6 h-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} /></div><h2 className="text-xl font-bold">{t.settingsTitle}</h2></div>
             
             <div className="space-y-6">
               {/* Translate */}
               <div className={`p-4 rounded-xl border space-y-3 ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
-                <div className="flex items-center gap-2 mb-1"><Globe className={`w-4 h-4 ${colors.accent}`} /><h3 className="text-sm font-bold">Translate (Gratis via Gemini)</h3></div>
-                <div className="space-y-2"><label className={`text-[10px] uppercase font-bold ${colors.textMuted}`}>Bahasa Tujuan</label><select value={targetLang} onChange={(e) => setTargetLang(e.target.value)} className={`w-full p-2 text-sm rounded-lg border focus:outline-none ${isDarkMode ? 'bg-neutral-900 border-white/10' : 'bg-white border-slate-200'}`}>{TARGET_LANGUAGES.map((lang) => <option key={lang.code} value={lang.code}>{lang.flag} {lang.name}</option>)}</select></div>
-                <button onClick={handleTranslate} disabled={isLoading} className={`w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all ${isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-500 hover:bg-blue-400 text-white'}`}><Languages className="w-3 h-3" />{isLoading ? "Menerjemahkan..." : "Terjemahkan Teks Editor"}</button>
+                <div className="flex items-center gap-2 mb-1"><Globe className={`w-4 h-4 ${colors.accent}`} /><h3 className="text-sm font-bold">{t.translateTitle}</h3></div>
+                <div className="space-y-2"><label className={`text-[10px] uppercase font-bold ${colors.textMuted}`}>{t.targetLangLabel}</label><select value={targetLang} onChange={(e) => setTargetLang(e.target.value)} className={`w-full p-2 text-sm rounded-lg border focus:outline-none ${isDarkMode ? 'bg-neutral-900 border-white/10' : 'bg-white border-slate-200'}`}>{TARGET_LANGUAGES.map((lang) => <option key={lang.code} value={lang.code}>{lang.flag} {lang.name}</option>)}</select></div>
+                <button onClick={handleTranslate} disabled={isLoading} className={`w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all ${isDarkMode ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-500 hover:bg-blue-400 text-white'}`}><Languages className="w-3 h-3" />{isLoading ? "..." : t.translateBtn}</button>
               </div>
 
               {/* Theme */}
               <div className={`flex items-center justify-between p-4 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
-                 <div className="flex items-center gap-2">{isDarkMode ? <Moon className="w-4 h-4 text-purple-400" /> : <Sun className="w-4 h-4 text-orange-500" />}<span className="text-sm font-bold">Mode Tampilan</span></div>
+                 <div className="flex items-center gap-2">{isDarkMode ? <Moon className="w-4 h-4 text-purple-400" /> : <Sun className="w-4 h-4 text-orange-500" />}<span className="text-sm font-bold">{t.themeLabel}</span></div>
                  <button onClick={toggleTheme} className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${isDarkMode ? 'bg-neutral-800 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-800 shadow-sm'}`}>{isDarkMode ? 'Gelap' : 'Terang'}</button>
               </div>
 
               {/* API Keys */}
               <div>
-                <div className="flex items-center gap-2 mb-4"><Key className={`w-4 h-4 ${colors.textMuted}`} /><h3 className="text-sm font-bold">API Keys</h3></div>
+                <div className="flex items-center gap-2 mb-4"><Key className={`w-4 h-4 ${colors.textMuted}`} /><h3 className="text-sm font-bold">{t.apiKeyLabel}</h3></div>
                 {/* Gemini Input */}
                 <div className="mb-4">
-                  <div className="flex justify-between items-center mb-1"><label className={`text-[10px] uppercase font-bold ${colors.textMuted}`}>API KEY Gemini</label><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className={`text-[10px] flex items-center gap-1 hover:underline ${colors.accent}`}>Dapatkan Key <ExternalLink className="w-2 h-2" /></a></div>
-                  <div className="relative"><input type="password" value={userGeminiApiKey} onChange={(e) => setUserGeminiApiKey(e.target.value)} placeholder="Tempel API Key Gemini..." className={`w-full p-3 rounded-xl border focus:outline-none transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} /><div className="absolute right-3 top-3 group cursor-help"><HelpCircle className={`w-4 h-4 ${colors.textMuted}`} /><div className="hidden group-hover:block absolute right-0 bottom-6 w-48 p-2 bg-black text-white text-[10px] rounded shadow-lg z-50">Unlimited generation & translate.</div></div></div>
+                  <div className="flex justify-between items-center mb-1"><label className={`text-[10px] uppercase font-bold ${colors.textMuted}`}>API KEY Gemini</label><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className={`text-[10px] flex items-center gap-1 hover:underline ${colors.accent}`}>Get Key <ExternalLink className="w-2 h-2" /></a></div>
+                  <div className="relative"><input type="password" value={userGeminiApiKey} onChange={(e) => setUserGeminiApiKey(e.target.value)} placeholder="Paste Key..." className={`w-full p-3 rounded-xl border focus:outline-none transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} /><div className="absolute right-3 top-3 group cursor-help"><HelpCircle className={`w-4 h-4 ${colors.textMuted}`} /><div className="hidden group-hover:block absolute right-0 bottom-6 w-48 p-2 bg-black text-white text-[10px] rounded shadow-lg z-50">Unlimited generation & translate.</div></div></div>
                 </div>
                 {/* ElevenLabs Input */}
                 <div>
-                  <div className="flex justify-between items-center mb-1"><label className={`text-[10px] uppercase font-bold ${colors.textMuted}`}>API KEY ElevenLabs</label><a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noreferrer" className={`text-[10px] flex items-center gap-1 hover:underline ${colors.accent}`}>Dapatkan Key <ExternalLink className="w-2 h-2" /></a></div>
-                  <div className="relative"><input type="password" value={elevenLabsApiKey} onChange={(e) => setElevenLabsApiKey(e.target.value)} placeholder="Tempel API Key ElevenLabs..." className={`w-full p-3 rounded-xl border focus:outline-none transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} /><div className="absolute right-3 top-3 group cursor-help"><HelpCircle className={`w-4 h-4 ${colors.textMuted}`} /><div className="hidden group-hover:block absolute right-0 bottom-6 w-48 p-2 bg-black text-white text-[10px] rounded shadow-lg z-50">Untuk fitur Pro Voice Cloning.</div></div></div>
+                  <div className="flex justify-between items-center mb-1"><label className={`text-[10px] uppercase font-bold ${colors.textMuted}`}>API KEY ElevenLabs</label><a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noreferrer" className={`text-[10px] flex items-center gap-1 hover:underline ${colors.accent}`}>Get Key <ExternalLink className="w-2 h-2" /></a></div>
+                  <div className="relative"><input type="password" value={elevenLabsApiKey} onChange={(e) => setElevenLabsApiKey(e.target.value)} placeholder="Paste Key..." className={`w-full p-3 rounded-xl border focus:outline-none transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`} /><div className="absolute right-3 top-3 group cursor-help"><HelpCircle className={`w-4 h-4 ${colors.textMuted}`} /><div className="hidden group-hover:block absolute right-0 bottom-6 w-48 p-2 bg-black text-white text-[10px] rounded shadow-lg z-50">Untuk fitur Pro Voice Cloning.</div></div></div>
                 </div>
               </div>
 
-              <button onClick={saveSettings} className={`w-full font-medium py-3 rounded-xl flex items-center justify-center gap-2 mt-4 transition-colors text-white ${isDarkMode ? 'bg-green-600 hover:bg-green-500' : 'bg-green-500 hover:bg-green-400 shadow-lg'}`}><Save className="w-4 h-4" /> Simpan Semua Pengaturan</button>
+              <button onClick={saveSettings} className={`w-full font-medium py-3 rounded-xl flex items-center justify-center gap-2 mt-4 transition-colors text-white ${isDarkMode ? 'bg-green-600 hover:bg-green-500' : 'bg-green-500 hover:bg-green-400 shadow-lg'}`}><Save className="w-4 h-4" /> {t.saveSettings}</button>
             </div>
           </div>
         </div>
@@ -995,11 +1201,12 @@ const MainApp = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean, toggleTheme
 // Root App to handle switching
 const App = () => {
   const [view, setView] = useState<'landing' | 'app'>('landing');
-  const [isDarkMode, setIsDarkMode] = useState(true); // Shared theme state
+  const [isDarkMode, setIsDarkMode] = useState(false); // Default Light
+  const [language, setLanguage] = useState<'id' | 'en'>('id'); // Default ID
 
   return view === 'landing' 
-    ? <LandingPage onStart={() => setView('app')} isDarkMode={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} /> 
-    : <MainApp isDarkMode={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} />;
+    ? <LandingPage onStart={() => setView('app')} isDarkMode={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} language={language} setLanguage={setLanguage} /> 
+    : <MainApp isDarkMode={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} language={language} setLanguage={setLanguage} />;
 };
 
 export default App;
