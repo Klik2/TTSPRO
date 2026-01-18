@@ -46,7 +46,11 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
-  Check
+  Check,
+  ChevronLeft,
+  FileText,
+  Shield,
+  Info
 } from 'lucide-react';
 
 // --- 1. DATA CONSTANTS ---
@@ -71,6 +75,134 @@ const TARGET_LANGUAGES = [
   { code: 'tl', name: 'Tagalog', flag: '🇵🇭' },
   { code: 'af', name: 'Afrika', flag: '🇿🇦' },
 ];
+
+const LEGAL_CONTENT = {
+  id: {
+    privacy: {
+      title: "Kebijakan Privasi (Privacy Policy)",
+      content: `
+      1. Pengumpulan Data
+      Kami memprioritaskan privasi Anda. Aplikasi ini dirancang sebagai Client-Side Application, yang berarti sebagian besar pemrosesan data terjadi langsung di perangkat (browser) Anda.
+
+      Teks & Audio: Teks yang Anda ketik dan audio yang dihasilkan diproses sementara untuk tujuan konversi suara.
+
+      Rekaman Suara (Cloning): Jika Anda menggunakan fitur Voice Cloning, rekaman suara Anda diproses hanya untuk membuat embedding suara dan disimpan secara lokal di browser (Local Storage) atau dikirim ke API Pihak Ketiga (Gemini/ElevenLabs) hanya untuk durasi pemrosesan. Kami tidak menyimpan rekaman suara Anda di server database kami.
+
+      2. Keamanan API Key
+      Ini adalah prioritas utama kami.
+      Jika Anda memasukkan API Key pribadi (Gemini atau ElevenLabs), kunci tersebut DISIMPAN SECARA LOKAL di browser Anda (localStorage).
+      Kami TIDAK mengirimkan API Key Anda ke server kami, database kami, atau pihak ketiga manapun selain langsung ke penyedia layanan AI (Google/ElevenLabs) untuk memproses permintaan Anda.
+      Anda memiliki kendali penuh untuk menghapus API Key dari penyimpanan browser kapan saja melalui menu Pengaturan.
+
+      3. Layanan Pihak Ketiga
+      Aplikasi ini menggunakan layanan API dari:
+      Google Gemini (Generative AI): Untuk pemrosesan teks, terjemahan, dan Text-to-Speech (Flash Model).
+      ElevenLabs: Untuk sintesis suara berkualitas tinggi.
+      Dengan menggunakan aplikasi ini, Anda juga tunduk pada kebijakan privasi Google dan ElevenLabs terkait data yang dikirimkan melalui API mereka.
+      `
+    },
+    tos: {
+      title: "Syarat & Ketentuan (Terms of Service)",
+      content: `
+      1. Penggunaan Layanan
+      Te_eR™ to Speech adalah alat bantu kreativitas. Anda setuju untuk tidak menggunakan layanan ini untuk:
+      Membuat konten ilegal, ujaran kebencian, fitnah, atau konten yang melanggar hukum di Indonesia.
+      Meniru suara tokoh publik/orang lain tanpa izin untuk tujuan penipuan (deepfakes).
+
+      2. Batasan Penggunaan (Rate Limiting)
+      Pengguna Gratis (Default API): Kami menyediakan akses gratis menggunakan kuota bersama. Jika terjadi Error 429 (Too Many Requests), itu berarti kuota global sedang penuh. Harap tunggu 1-5 menit sebelum mencoba lagi.
+      Pengguna API Key Pribadi: Jika Anda menggunakan API Key sendiri, batasan penggunaan mengikuti kuota akun Google/ElevenLabs pribadi Anda. Kami tidak bertanggung jawab atas biaya yang mungkin timbul dari penyedia API jika Anda melebihi kuota gratis mereka.
+
+      3. Batasan Karakter
+      Demi menjaga stabilitas performa:
+      Sekali generate, disarankan maksimal 500 - 1.000 karakter.
+      Teks yang terlalu panjang berisiko terpotong atau gagal diproses oleh server AI.
+
+      4. Hak Cipta (Intellectual Property)
+      Aplikasi: Kode sumber, desain antarmuka, dan branding "Te_eR™" adalah hak cipta pengembang.
+      Konten Hasil Generate: Suara yang Anda hasilkan adalah milik Anda. Anda bebas menggunakannya untuk konten YouTube, TikTok, atau kebutuhan komersial lainnya, KECUALI dibatasi oleh ketentuan layanan dari model AI yang digunakan (Google/ElevenLabs).
+      Catatan: Pastikan Anda memiliki lisensi yang sesuai jika menggunakan musik latar atau aset lain di luar aplikasi ini.
+
+      5. Penyangkalan (Disclaimer)
+      Layanan ini disediakan "sebagaimana adanya". Kami tidak menjamin layanan akan selalu aktif 100% tanpa gangguan, mengingat ketergantungan pada server pihak ketiga.
+      `
+    }
+  },
+  en: {
+    privacy: {
+      title: "Privacy Policy",
+      content: `
+      1. Data Collection
+      We prioritize your privacy. This application is designed as a Client-Side Application, meaning most data processing happens directly on your device (browser).
+
+      Text & Audio: The text you type and the generated audio are processed temporarily for voice conversion purposes.
+
+      Voice Recording (Cloning): If you use the Voice Cloning feature, your voice recording is processed only to create voice embeddings and is stored locally in the browser (Local Storage) or sent to Third-Party APIs (Gemini/ElevenLabs) solely for processing duration. We do not store your voice recordings on our database servers.
+
+      2. API Key Security
+      This is our top priority.
+      If you enter a personal API Key (Gemini or ElevenLabs), the key is STORED LOCALLY in your browser (localStorage).
+      We DO NOT send your API Key to our servers, our database, or any third party other than directly to the AI service providers (Google/ElevenLabs) to process your request.
+      You have full control to remove the API Key from browser storage at any time via the Settings menu.
+
+      3. Third-Party Services
+      This application uses API services from:
+      Google Gemini (Generative AI): For text processing, translation, and Text-to-Speech (Flash Model).
+      ElevenLabs: For high-quality voice synthesis.
+      By using this application, you are also subject to Google's and ElevenLabs' privacy policies regarding data sent via their APIs.
+      `
+    },
+    tos: {
+      title: "Terms of Service",
+      content: `
+      1. Service Usage
+      Te_eR™ to Speech is a creativity tool. You agree not to use this service to:
+      Create illegal content, hate speech, defamation, or content that violates laws in Indonesia.
+      Impersonate public figures/others without permission for fraudulent purposes (deepfakes).
+
+      2. Usage Limits (Rate Limiting)
+      Free Users (Default API): We provide free access using a shared quota. If Error 429 (Too Many Requests) occurs, it means the global quota is full. Please wait 1-5 minutes before trying again.
+      Personal API Key Users: If you use your own API Key, usage limits follow your personal Google/ElevenLabs account quota. We are not responsible for costs that may arise from API providers if you exceed their free quotas.
+
+      3. Character Limits
+      To maintain performance stability:
+      Per generation, we recommend a maximum of 500 - 1,000 characters.
+      Text that is too long risks being cut off or failing to process by the AI server.
+
+      4. Intellectual Property
+      Application: Source code, interface design, and "Te_eR™" branding are the developer's copyright.
+      Generated Content: The voice you generate is yours. You are free to use it for YouTube, TikTok, or other commercial needs, UNLESS restricted by the terms of service of the AI model used (Google/ElevenLabs).
+      Note: Ensure you have appropriate licenses if using background music or other assets outside this application.
+
+      5. Disclaimer
+      This service is provided "as is". We do not guarantee the service will be 100% active without interruption, given the dependence on third-party servers.
+      `
+    }
+  }
+};
+
+const FAQ_DATA = {
+  id: [
+    { q: "Kenapa muncul pesan 'API Key Tidak Valid' atau error generate suara?", a: "API Key Not Valid berarti BELUM ADA (Masih Kosong), belum di masukan di kolom pengaturan API KEY. Solusi: Silahkan Copy paste API Key Gemini/ ElevenLabs di kolom pengisian API Key. BELUM memiliki API Key? Klik icon gerigi (pengaturan) di pojok kanan atas, klik salah satu 'Get Key' otomatis Anda akan di arahkan ke website penyedia API Key Gemini / ElevenLabs." },
+    { q: "Apakah aman memasukkan API Key saya sendiri di sini?", a: "Sangat aman. Seperti dijelaskan dalam Kebijakan Privasi, API Key Anda hanya disimpan di Local Storage browser (HP/Laptop) Anda sendiri. Kunci tersebut tidak pernah dikirim ke server kami." },
+    { q: "Apakah saya boleh menggunakan suara hasil download untuk YouTube/Monetisasi?", a: "Ya, boleh! Hasil suara yang dihasilkan melalui Gemini Flash dan ElevenLabs umumnya boleh digunakan untuk konten komersial. Namun, Anda tetap disarankan untuk memeriksa kebijakan terbaru dari Google AI Studio dan ElevenLabs Free/Pro plan untuk kepastian hukum penuh." },
+    { q: "Berapa panjang teks maksimal yang bisa saya ubah jadi suara?", a: "Tidak ada batasan harian, tapi per satu kali klik 'Buat Suara', kami menyarankan maksimal 1.000 karakter. Jika Anda punya naskah panjang, silakan pecah menjadi beberapa paragraf." },
+    { q: "Kenapa fitur Rekam Suara (Cloning) hasilnya berbeda dengan suara asli saya?", a: "Fitur cloning pada Gemini Flash masih dalam tahap eksperimental (Preview). Kualitas kemiripan sangat bergantung pada kualitas mikrofon Anda, kebisingan latar belakang, dan kejelasan pengucapan saat merekam." },
+    { q: "Kenapa muncul pesan 'HTTP Error 429' atau suara tidak keluar?", a: "Error 429 berarti 'Terlalu Banyak Permintaan'. Karena ini adalah layanan gratis, server Google membatasi jumlah permintaan per menit. Solusi: Tunggu sekitar 1-3 menit, lalu coba lagi." },
+    { q: "Bagaimana cara menghubungi, menyampaikan masukan/ keluhan?", a: "Silahkan klik icon ✉️ Contact Us di bagian footer. Anda otomatis akan terhubung dengan platform email." },
+    { q: "Bagaimana jika ingin berdonasi?", a: "Silahkan klik tombol button support us atau Buy me Ko-fi di bagian footer." }
+  ],
+  en: [
+    { q: "Why do I get 'Invalid API Key' message or voice generation error?", a: "Invalid API Key means it is EMPTY or not entered in the settings. Solution: Copy paste your Gemini/ElevenLabs API Key in the settings. Don't have one? Click the settings gear icon, click 'Get Key' to be directed to the provider's website." },
+    { q: "Is it safe to enter my own API Key here?", a: "Very safe. As explained in the Privacy Policy, your API Key is only stored in your browser's Local Storage (Phone/Laptop). It is never sent to our servers." },
+    { q: "Can I use the downloaded voice for YouTube/Monetization?", a: "Yes, you can! Voices generated via Gemini Flash and ElevenLabs are generally allowed for commercial content. However, please check the latest policies from Google AI Studio and ElevenLabs Free/Pro plans for full legal certainty." },
+    { q: "What is the max text length I can convert?", a: "There is no daily limit, but per 'Generate' click, we recommend max 1,000 characters. If you have a long script, please break it into paragraphs." },
+    { q: "Why does Voice Cloning sound different from my real voice?", a: "Cloning on Gemini Flash is experimental (Preview). Similarity depends heavily on mic quality, background noise, and pronunciation clarity." },
+    { q: "Why 'HTTP Error 429' or no sound?", a: "Error 429 means 'Too Many Requests'. As a free service, Google limits requests per minute. Solution: Wait 1-3 minutes and try again." },
+    { q: "How to contact for feedback/complaints?", a: "Click the ✉️ Contact Us icon in the footer. You will be connected to email platform." },
+    { q: "How to donate?", a: "Click the Support Us or Buy me Ko-fi button in the footer." }
+  ]
+};
 
 const TRANSLATIONS = {
   id: {
@@ -130,7 +262,13 @@ const TRANSLATIONS = {
     cat_qori: "Murotal PRO (Qori)",
     select_voice_placeholder: "Pilih Model Suara...",
     installApp: "Install Aplikasi (PWA)",
-    installBtn: "Download / Install App"
+    installBtn: "Download / Install App",
+    faqTitle: "FAQ (Tanya Jawab)",
+    agreeBtn: "Ya, Setuju",
+    disagreeBtn: "Tidak",
+    privacyLink: "Privacy Policy",
+    tosLink: "Terms of Service",
+    runningWarning: "Pastikan Anda telah membaca \"Privacy Policy dan Term of Service\" di bagian paling bawah (footer)"
   },
   en: {
     tagline: "TEXT TO BACOT PRO",
@@ -190,7 +328,13 @@ const TRANSLATIONS = {
     cat_qori: "Murotal PRO (Qori)",
     select_voice_placeholder: "Select Voice Model...",
     installApp: "Install App (PWA)",
-    installBtn: "Download / Install App"
+    installBtn: "Download / Install App",
+    faqTitle: "FAQ (Frequently Asked Questions)",
+    agreeBtn: "Yes, I Agree",
+    disagreeBtn: "No",
+    privacyLink: "Privacy Policy",
+    tosLink: "Terms of Service",
+    runningWarning: "Please ensure you have read \"Privacy Policy and Terms of Service\" at the bottom section (footer)"
   }
 };
 
@@ -203,6 +347,11 @@ const AUDIO_SAMPLES = [
   // ADDED NEW SAMPLES
   { title: "Accent Russian (Halo my friend)", file: "https://github.com/Klik2/TTSPRO/blob/main/public/Te_eR_Halo_my_friend_PrivietMy__2026-01-16-19-20-04.wav?raw=true", type: "Accent" },
   { title: "Accent UK (British)", file: "https://github.com/Klik2/TTSPRO/blob/main/public/Te_eR_Harry_Potter_is_enjoying__2026-01-15-11-57-44.wav?raw=true", type: "Accent" },
+  { title: "Accent French", file: "https://github.com/Klik2/TTSPRO/blob/ea677abccaf7bb44bd72904109bb7c2540bc2e94/public/Te_eR_1_Sous_la_vote_azure_nous_2026-01-16-21-12-02.wav?raw=true", type: "Accent" },
+  { title: "Accent Spanish", file: "https://github.com/Klik2/TTSPRO/blob/ea677abccaf7bb44bd72904109bb7c2540bc2e94/public/Te_eR_Humor_La_lucha_diaria1_To_2026-01-16-21-08-29.wav?raw=true", type: "Accent" },
+  { title: "Accent Hindi", file: "https://github.com/Klik2/TTSPRO/blob/ea677abccaf7bb44bd72904109bb7c2540bc2e94/public/Te_eR_Humour_Rozmarra_ki_Jaddoj_2026-01-16-21-05-05.wav?raw=true", type: "Accent" },
+  { title: "Accent Chinese", file: "https://github.com/Klik2/TTSPRO/blob/ea677abccaf7bb44bd72904109bb7c2540bc2e94/public/Te_eR__2026-01-16-20-56-14.wav?raw=true", type: "Accent" },
+  { title: "Accent Japanese", file: "https://github.com/Klik2/TTSPRO/blob/ea677abccaf7bb44bd72904109bb7c2540bc2e94/public/Te_eR_1_2_3_2026-01-16-21-00-54.wav?raw=true", type: "Accent" },
   // UPDATED QORI PRIA
   { title: "Murotal Qori Pria", file: "https://github.com/Klik2/TTSPRO/blob/0a224c95b984d66528cf2c1bbdac40e9346263d7/public/Te_eR_suara_sy_QS-18-1.wav?raw=true", type: "Qori" },
   { title: "Murotal Qori Wanita", file: "https://github.com/Klik2/TTSPRO/blob/main/public/Te_eR_Quran_Surah_AlKahfi_18_1_2026-01-15-02-21-10.wav?raw=true", type: "Qori" },
@@ -464,6 +613,86 @@ const generateFilename = (text: string) => {
 
 // --- 3. COMPONENTS ---
 
+const InfoModal = ({ title, content, onClose, onAgree, onDisagree, showButtons, t, isDarkMode }: any) => {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={onClose} />
+      <div className={`rounded-2xl border w-full max-w-2xl relative z-10 flex flex-col max-h-[90vh] shadow-2xl animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-neutral-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+        
+        {/* Header */}
+        <div className={`p-4 border-b flex items-center justify-between ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h2 className="text-lg font-bold text-center flex-1">{title}</h2>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 overflow-y-auto custom-scrollbar leading-relaxed whitespace-pre-line text-sm opacity-90">
+          {content}
+        </div>
+
+        {/* Footer Buttons */}
+        {showButtons && (
+          <div className={`p-4 border-t flex flex-col sm:flex-row gap-3 ${isDarkMode ? 'border-white/5 bg-black/20' : 'border-slate-100 bg-slate-50'}`}>
+            <button 
+              onClick={onDisagree}
+              className={`flex-1 py-3 rounded-xl font-bold border transition-colors ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-slate-300 hover:bg-slate-200'}`}
+            >
+              {t.disagreeBtn}
+            </button>
+            <button 
+              onClick={onAgree}
+              className={`flex-1 py-3 rounded-xl font-bold text-white shadow-lg transition-transform active:scale-95 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-600 hover:bg-blue-500'}`}
+            >
+              {t.agreeBtn}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const FAQSection = ({ data, t, isDarkMode }: any) => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const toggle = (i: number) => {
+    setOpenIndex(openIndex === i ? null : i);
+  };
+
+  return (
+    <div className={`rounded-2xl border overflow-hidden transition-colors ${isDarkMode ? 'bg-neutral-900 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
+      <div className={`p-4 border-b ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+        <h3 className="font-bold flex items-center gap-2">
+           <HelpCircle className="w-5 h-5 text-blue-500" /> {t.faqTitle}
+        </h3>
+      </div>
+      <div>
+        {data.map((item: any, i: number) => (
+          <div key={i} className={`border-b last:border-0 ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+            <button 
+              onClick={() => toggle(i)}
+              className={`w-full px-4 py-4 text-left flex items-start justify-between gap-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors`}
+            >
+              <span className="text-sm font-semibold">{item.q}</span>
+              {openIndex === i ? <ChevronUp className="w-4 h-4 shrink-0 mt-1 opacity-50" /> : <ChevronDown className="w-4 h-4 shrink-0 mt-1 opacity-50" />}
+            </button>
+            {openIndex === i && (
+              <div className={`px-4 pb-4 pt-0 text-sm opacity-80 leading-relaxed ${isDarkMode ? 'text-neutral-300' : 'text-slate-600'}`}>
+                {item.a}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Custom Dropdown Component
 const CustomVoiceSelect = ({ selectedId, onChange, isDarkMode, customClones, t }: any) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -607,40 +836,25 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
   const [activeAudioIndex, setActiveAudioIndex] = useState<number | null>(null);
   const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
 
+  const [showTosModal, setShowTosModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+
   const t = TRANSLATIONS[language as keyof typeof TRANSLATIONS] || TRANSLATIONS.id;
+  const legal = LEGAL_CONTENT[language as keyof typeof LEGAL_CONTENT] || LEGAL_CONTENT.id;
 
   // SEO & Favicon Injection
   useEffect(() => {
     document.title = "Te_eR™ to Speech - Text to Bacot PRO";
-    
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.setAttribute('name', 'description');
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute('content', 'Aplikasi Text-to-Speech gratis terbaik. Ubah teks jadi suara dengan 50+ model suara, logat daerah, aksen negara, dan murotal. Supports Gemini & ElevenLabs.');
-
-    let metaKeywords = document.querySelector('meta[name="keywords"]');
-    if (!metaKeywords) {
-      metaKeywords = document.createElement('meta');
-      metaKeywords.setAttribute('name', 'keywords');
-      document.head.appendChild(metaKeywords);
-    }
-    metaKeywords.setAttribute('content', 'text to speech, tts indonesia, logat daerah, voice cloning, suara google, elevenlabs free, gemini tts, murotal ai, text to bacot');
-
-    const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement || document.createElement('link');
-    favicon.rel = 'icon';
-    favicon.type = 'image/svg+xml';
-    document.head.appendChild(favicon);
-
+    // ... existing favicon logic ...
     let toggle = false;
     const interval = setInterval(() => {
       const icon = toggle ? '🗣️' : '🔊';
+      const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement || document.createElement('link');
+      favicon.rel = 'icon';
       favicon.href = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${icon}</text></svg>`;
+      if (!document.head.contains(favicon)) document.head.appendChild(favicon);
       toggle = !toggle;
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -690,6 +904,10 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
         setActiveAudioIndex(null);
       }
     }
+  };
+
+  const handleStartClick = () => {
+    setShowTosModal(true); // Open TOS on start
   };
 
   const bgClass = isDarkMode ? 'bg-neutral-950 text-white selection:bg-cyan-500/30' : 'bg-slate-50 text-slate-900 selection:bg-blue-200';
@@ -754,7 +972,7 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
         </p>
 
         <button 
-            onClick={onStart}
+            onClick={handleStartClick}
             className="mb-8 px-8 py-3 bg-white text-black rounded-full font-bold text-base hover:bg-cyan-50 transition-colors animate-[pulse_2s_infinite] border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]"
           >
             {t.startBtn}
@@ -827,7 +1045,7 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
         <div className={`absolute inset-0 bg-gradient-to-t -z-10 ${isDarkMode ? 'from-blue-900/20' : 'from-blue-100'} to-transparent`}></div>
         <h3 className="text-2xl md:text-4xl font-bold mb-8">{t.ctaTitle}</h3>
         <button 
-          onClick={onStart}
+          onClick={handleStartClick}
           className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-blue-600 font-lg rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 hover:bg-blue-500 animate-[pulse_1.5s_infinite]"
         >
           <span className="mr-2 text-xl">{t.ctaBtn1}</span>
@@ -842,8 +1060,53 @@ const LandingPage = ({ onStart, isDarkMode, toggleTheme, language, setLanguage }
           <p className="text-xs font-mono text-cyan-500/50 animate-pulse tracking-[0.2em]">
             Te_eR™ Inovative @2026
           </p>
+          
+          {/* Legal Links */}
+          <div className="flex gap-4 mt-2 text-[10px] opacity-70">
+            <button onClick={() => setShowPrivacyModal(true)} className="hover:underline hover:text-cyan-400">
+              {t.privacyLink}
+            </button>
+            <span>|</span>
+            <button onClick={() => setShowTosModal(true)} className="hover:underline hover:text-cyan-400">
+              {t.tosLink}
+            </button>
+          </div>
         </div>
       </footer>
+
+      {/* Modals for Legal */}
+      {showPrivacyModal && (
+        <InfoModal 
+          title={legal.privacy.title} 
+          content={legal.privacy.content} 
+          onClose={() => setShowPrivacyModal(false)}
+          showButtons={true}
+          onAgree={() => {
+            setShowPrivacyModal(false);
+            onStart();
+          }}
+          onDisagree={() => setShowPrivacyModal(false)}
+          t={t}
+          isDarkMode={isDarkMode}
+        />
+      )}
+
+      {showTosModal && (
+        <InfoModal 
+          title={legal.tos.title} 
+          content={legal.tos.content} 
+          onClose={() => setShowTosModal(false)}
+          showButtons={true}
+          onAgree={() => {
+            setShowTosModal(false);
+            onStart();
+          }}
+          onDisagree={() => setShowTosModal(false)}
+          t={t}
+          isDarkMode={isDarkMode}
+        />
+      )}
+
     </div>
   );
 };
@@ -873,6 +1136,8 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'error' | 'success', text: string } | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showTosModal, setShowTosModal] = useState(false);
   
   const [userGeminiApiKey, setUserGeminiApiKey] = useState<string>("");
   const [elevenLabsApiKey, setElevenLabsApiKey] = useState<string>("");
@@ -886,6 +1151,8 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const t = TRANSLATIONS[language as keyof typeof TRANSLATIONS] || TRANSLATIONS.id;
+  const legal = LEGAL_CONTENT[language as keyof typeof LEGAL_CONTENT] || LEGAL_CONTENT.id;
+  const faqData = FAQ_DATA[language as keyof typeof FAQ_DATA] || FAQ_DATA.id;
 
   // Theme Colors
   const colors = {
@@ -916,6 +1183,12 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
     const interval = setInterval(() => {
       setShowSpeakerIcon(prev => !prev);
     }, 3000);
+
+    // PWA Install Prompt Capture
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        setDeferredPrompt(e);
+    });
 
     return () => clearInterval(interval);
   }, []);
@@ -1149,6 +1422,13 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
     setStatusMsg({ type: 'success', text: t.recSave + ' OK!' });
   };
 
+  const handleInstallApp = () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => setDeferredPrompt(null));
+    }
+  };
+
   // --- RENDER MAIN APP ---
   return (
     <div className={`min-h-screen font-sans pb-10 flex flex-col transition-colors duration-500 ${colors.bg} ${colors.text}`}>
@@ -1170,10 +1450,31 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* PWA INSTALL ICON */}
+            {deferredPrompt && (
+                <button 
+                  onClick={handleInstallApp}
+                  className={`p-2.5 rounded-xl border transition-all duration-300 ${isDarkMode ? 'border-white/10 hover:bg-white/5 text-cyan-400' : 'border-slate-200 hover:bg-slate-100 text-blue-600'}`}
+                  title={t.installApp}
+                >
+                  <Download className="w-5 h-5" />
+                </button>
+            )}
+            
             <button onClick={() => setIsSettingsOpen(true)} className={`p-2.5 rounded-xl border transition-all duration-300 group ${elevenLabsApiKey ? `${colors.accentBorder} ${isDarkMode ? 'bg-lime-500/5' : 'bg-blue-500/5'}` : `${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-slate-200 hover:bg-slate-100'}`}`}>
               <Settings className={`w-5 h-5 transition-colors ${elevenLabsApiKey ? colors.accent : 'text-neutral-400'}`} />
             </button>
           </div>
+        </div>
+
+        {/* RUNNING TEXT WARNING */}
+        <div className="w-full bg-red-500 overflow-hidden py-1">
+             <div className="whitespace-nowrap animate-marquee">
+                 <span className="text-white text-xs font-bold px-4">{t.runningWarning}</span>
+                 <span className="text-white text-xs font-bold px-4">{t.runningWarning}</span>
+                 <span className="text-white text-xs font-bold px-4">{t.runningWarning}</span>
+                 <span className="text-white text-xs font-bold px-4">{t.runningWarning}</span>
+             </div>
         </div>
       </header>
 
@@ -1361,6 +1662,11 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
                 </p>
               </div>
 
+               {/* FAQ SECTION */}
+               <div className="mt-6">
+                 <FAQSection data={faqData} t={t} isDarkMode={isDarkMode} />
+               </div>
+
             </div>
 
             {/* PLAYER (Hidden Audio Element for Logic) */}
@@ -1383,6 +1689,17 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
         <div className="flex flex-col items-center gap-2">
            <a href="mailto:hijrtime+ttspro@gmail.com" className={`flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-bold transition-all hover:scale-105 ${isDarkMode ? 'border-white/10 hover:bg-white/10' : 'border-slate-300 hover:bg-slate-100'}`}><Mail className="w-3 h-3" /> {t.footerContact}</a>
            <p className={`text-xs font-mono animate-pulse tracking-widest ${isDarkMode ? 'text-lime-400/80' : 'text-blue-600/80'}`}>Te_eR™ Inovative @2026</p>
+           
+           {/* Legal Links in App */}
+           <div className="flex gap-4 mt-2 text-[10px] opacity-70">
+            <button onClick={() => setShowPrivacyModal(true)} className="hover:underline hover:text-cyan-400">
+              {t.privacyLink}
+            </button>
+            <span>|</span>
+            <button onClick={() => setShowTosModal(true)} className="hover:underline hover:text-cyan-400">
+              {t.tosLink}
+            </button>
+          </div>
         </div>
       </footer>
 
@@ -1444,6 +1761,30 @@ const MainApp = ({ isDarkMode, toggleTheme, language }: any) => {
           </div>
         </div>
       )}
+
+      {/* Modals for Legal Links inside App */}
+      {showPrivacyModal && (
+        <InfoModal 
+          title={legal.privacy.title} 
+          content={legal.privacy.content} 
+          onClose={() => setShowPrivacyModal(false)}
+          showButtons={false}
+          t={t}
+          isDarkMode={isDarkMode}
+        />
+      )}
+
+      {showTosModal && (
+        <InfoModal 
+          title={legal.tos.title} 
+          content={legal.tos.content} 
+          onClose={() => setShowTosModal(false)}
+          showButtons={false}
+          t={t}
+          isDarkMode={isDarkMode}
+        />
+      )}
+
     </div>
   );
 };
