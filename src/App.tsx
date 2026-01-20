@@ -1818,6 +1818,11 @@ const App = () => {
           // window.Pi.authenticate(scopes, onIncompletePaymentFound).then((auth: any) => {
           //    console.log("Hello " + auth.user.username);
           // });
+          // Opsional: Cek lagi setelah beberapa saat jika internet lambat
+           setTimeout(() => {
+              if (window.Pi) window.Pi.init({ version: "2.0", sandbox: true });
+           }, 1000);
+        }
         }
       } catch (err) {
         console.error("Pi SDK Error:", err);
@@ -1833,3 +1838,4 @@ const App = () => {
 };
 
 export default App;
+
