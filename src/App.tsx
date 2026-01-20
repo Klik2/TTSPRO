@@ -53,7 +53,14 @@ import {
   Info
 } from 'lucide-react';
 
-// --- 1. DATA CONSTANTS ---
+// --- 1. DEKLARASI GLOBAL TYPE ---
+declare global {
+  interface Window {
+    Pi: any;
+  }
+}
+
+// --- 2. DATA CONSTANTS ---
 
 const TARGET_LANGUAGES = [
   { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
@@ -106,7 +113,7 @@ const LEGAL_CONTENT = {
       content: `
       1. Penggunaan Layanan
       Te_eR™ to Speech adalah alat bantu kreativitas. Anda setuju untuk tidak menggunakan layanan ini untuk:
-      Membuat konten ilegal, ujaran kebencian, fitnah, atau konten yang melanggar hukum di Indonesia.
+      Membuat konten ilegal, ujaran kebencian, fitnah, atau konten yang melanggar hukum di Indonesia dan atau di Negara tempat tinggal Anda.
       Meniru suara tokoh publik/orang lain tanpa izin untuk tujuan penipuan (deepfakes).
 
       2. Batasan Penggunaan (Rate Limiting)
@@ -157,11 +164,11 @@ const LEGAL_CONTENT = {
       content: `
       1. Service Usage
       Te_eR™ to Speech is a creativity tool. You agree not to use this service to:
-      Create illegal content, hate speech, defamation, or content that violates laws in Indonesia.
+      Create illegal content, hate speech, defamation, or content that violates laws in Indonesia and or your country stayed.
       Impersonate public figures/others without permission for fraudulent purposes (deepfakes).
 
       2. Usage Limits (Rate Limiting)
-      Free Users (Default API): We provide free access using a shared quota. If Error 429 (Too Many Requests) occurs, it means the global quota is full. Please wait 1-5 minutes before trying again.
+      Free Users (Default API): We provide free access using a shared quota. If Error 429 (Too Many Requests), it means the global quota is full. Please wait 1-5 minutes before trying again.
       Personal API Key Users: If you use your own API Key, usage limits follow your personal Google/ElevenLabs account quota. We are not responsible for costs that may arise from API providers if you exceed their free quotas.
 
       3. Character Limits
@@ -1794,6 +1801,31 @@ const App = () => {
   const [view, setView] = useState<'landing' | 'app'>('landing');
   const [isDarkMode, setIsDarkMode] = useState(false); // Default Light
   const [language, setLanguage] = useState<'id' | 'en'>('id'); // Default ID
+
+  // --- 2. Inisialisasi Pi SDK ---
+  useEffect(() => {
+    const initPi = async () => {
+      try {
+        // Cek apakah script Pi SDK sudah termuat di window
+        if (window.Pi) {
+          // Inisialisasi: sandbox: true (untuk Testnet/Development)
+          // Ubah ke false jika sudah Live Mainnet
+          window.Pi.init({ version: "2.0", sandbox: true });
+          
+          // Opsional: Langsung minta autentikasi user
+          // const scopes = ['username', 'payments'];
+          // const onIncompletePaymentFound = (payment: any) => {}; 
+          // window.Pi.authenticate(scopes, onIncompletePaymentFound).then((auth: any) => {
+          //    console.log("Hello " + auth.user.username);
+          // });
+        }
+      } catch (err) {
+        console.error("Pi SDK Error:", err);
+      }
+    };
+
+    initPi();
+  }, []);
 
   return view === 'landing' 
     ? <LandingPage onStart={() => setView('app')} isDarkMode={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} language={language} setLanguage={setLanguage} /> 
